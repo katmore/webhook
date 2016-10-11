@@ -1,0 +1,6 @@
+.*
+!/.gitignore
+composer.lock
+**/vendor/*
+app/config/Webhook/RepoEvent*
+!app/config/Webhook/RepoEvent/example.com*

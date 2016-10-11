@@ -1,0 +1,21 @@
+{
+   "name": "katmore/webhook",
+   "description" : "Github webhook implementation",
+   "homepage":"https://github.com/katmore/webhook",
+   "dist": {
+        "url": "https://github.com/katmore/webhook",
+        "type": "git"
+    },
+    "require": {
+        "php" : ">=7.0.1",
+        "ext-hash" : "*",
+        "ext-json" : "*"
+    },
+    "autoload": {
+        "psr-4": { 
+            "SpyDash\\": "src/SpyDash",
+            "SpyDashRoute\\": "app/SpyDashRoute",
+            "SpyDashWeb\\": "app/SpyDashWeb"
+         }
+    }    
+}
