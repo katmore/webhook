@@ -34,6 +34,8 @@ trait PopulatorTrait {
     */
    public function populateFromObject($input) {
       
+      if (!is_object($input)) $input=new \stdClass;
+      
       $object = $this;
       
       $mapProp = (new \ReflectionObject($input))->getProperties(\ReflectionProperty::IS_PUBLIC);
