@@ -40,7 +40,7 @@ trait PopulatorTrait {
       
       $mapProp = (new \ReflectionObject($input))->getProperties(\ReflectionProperty::IS_PUBLIC);
       $mapList = [];
-      foreach($mapProp as $v) $mapList[]=$v->name;
+      foreach($mapProp as $v) $mapList[]=$v->getName();
       
       foreach($object as $p=>$v) {
          
