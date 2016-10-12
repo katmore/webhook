@@ -1,130 +1,94 @@
 <?php
-namespace Webhook;
+use Webhook\Callback;
+use Webhook\Delivery;
+use Webhook\EventCallbackRule;
+use Webhook\UrlCallbackRule;
+use Webhook\Response;
 
 return new class() {
-   CONST X_HUB_SECRET = "";
-    
-    
-    
-    
-    
-   CONST REPO_PATH = __DIR__."/../";
-    
-
-
-
-
+   
+   public static function callbacksConfig() {
+      return [
+         new Callback('My Secret',function( ) {
+            $line = exec("svn up " .self::REPO_PATH . ' 2>&1',$out,$ret);
+            if ($ret==0) {
+               $statusCode = 200;
+            } else {
+               $statusCode = 500;
+            }
+            return new Response(implode("\n",$out)."\n",$statusCode);
+         },new EventCallbackRule('push'),new UrlCallbackRule('https://example.com/my-org/my-repo')),
+      ];
+   }
+   
    public function __construct() {
-
-
-
-      ini_set('display_errors','1');
-
-
-
-
-
-      ini_set('html_errors', false);
+      //ini_set('display_errors',1);
+      //ini_set('html_errors', false);
       header('Content-Type:text/plain');
-
-
-      register_shutdown_function(function() {
-         $last_error = error_get_last();
-         if ($last_error && isset($last_error['type'])) {
-            if (!in_array($last_error['type'],[E_DEPRECATED,E_WARNING,E_NOTICE,E_RECOVERABLE_ERROR,E_USER_DEPRECATED,E_USER_NOTICE,E_USER_WARNING])) {
-               http_response_code (500);
+   
+      require(__DIR__."/../vendor/autoload.php");
+      
+      set_exception_handler(function(\Throwable  $e) {
+         http_response_code(500);
+         $trace=[];
+         foreach($e->getTrace() as $t) {
+            $item=[];
+            foreach($t as $k=>$v) {
+               if ($k!="args") $item[$k]=$v;
             }
+            if (!empty($item['class']) && (false !== ( strpos($item['class'], get_called_class()) ))) {
+               continue;
+            }
+            $trace[]=$item;
          }
+         
+         $edata = [
+            'Response'=>['status_code'=>500,'description'=>'Internal Server Error'],
+            'Type'=>'Unhandled Exception',
+            'Class'=>get_class($e),
+            'Message'=>$e->getMessage(),
+            'Code'=>$e->getCode(),
+            'File'=>$e->getFile(),
+            'Line'=>$e->getLine(),
+            'Stack Trace'=>$trace,
+         ];
+         echo json_encode($edata,\JSON_PRETTY_PRINT);
       });
-
-         if (empty($_SERVER) || empty($_SERVER['REQUEST_METHOD']) || ($_SERVER['REQUEST_METHOD'] != 'POST')) {
-            trigger_error("bad request",E_USER_ERROR);
+      
+      set_error_handler(function($errno,$errstr,$errfile,$errline) {
+         http_response_code(500);
+         $edata = [
+            'Response'=>['status_code'=>500,'description'=>'Internal Server Error'],
+            'Type'=>'php error',
+            'Errno'=>$errno,
+            'Errstr'=>$errstr,
+            'File'=>$errfile,
+            'Line'=>$errline,
+            'Stack Trace'=>debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS),
+         ];
+         echo json_encode($edata,\JSON_PRETTY_PRINT);
+      },error_reporting());
+   
+      $server = [];
+      if (!empty($_SERVER)) $server = $_SERVER;
+   
+      $delivery = new Delivery(
+            file_get_contents('php://input'), //messageBody
+            (!empty($_SERVER["CONTENT_TYPE"]))?$_SERVER["CONTENT_TYPE"]:"", //contentType
+            (!empty($_SERVER["HTTP_X_GITHUB_EVENT"]))?$_SERVER["HTTP_X_GITHUB_EVENT"]:"", //gitHubEvent
+            (!empty($_SERVER["HTTP_X_HUB_SIGNATURE"]))?$_SERVER["HTTP_X_HUB_SIGNATURE"]:"", //hubSignature
+            (!empty($_SERVER["HTTP_X_GITHUB_DELIVERY"]))?$_SERVER["HTTP_X_GITHUB_DELIVERY"]:"", //gitHubDelivery
+            (!empty($_SERVER["REQUEST_METHOD"]))?$_SERVER["REQUEST_METHOD"]:"", //requestMethod
+            (!empty($_SERVER["HTTP_USER_AGENT"]))?$_SERVER["HTTP_USER_AGENT"]:""//userAgent
+            );
+   
+      foreach(self::callbacksConfig() as $callback) {
+         if ($callback instanceof Callback) {
+   
+            $callback->validateRequest($delivery->getHubSignature(), $delivery->getMessageBody(), $delivery->getPayload());
+   
          }
-
-         if (empty($_SERVER['HTTP_X_HUB_SIGNATURE'])) {
-            trigger_error("missing X-Hub-Signature",E_USER_ERROR);
-         }
-         list($algo, $hash) = explode('=', $_SERVER['HTTP_X_HUB_SIGNATURE'], 2) + array('', '');
-         $rawPost = file_get_contents('php://input');
-         if ($hash !== hash_hmac($algo, $rawPost, self::X_HUB_SECRET)) {
-            trigger_error("bad secret",E_USER_ERROR);
-         }
-         $payload = json_decode($rawPost);
-
-
-
-
-
-         /*
-          *
-          * webhook handling
-          */
-         $line = exec("svn up " .self::REPO_PATH . ' 2>&1',$out,$ret);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-         if ($ret!=0) {
-            http_response_code (500);
-         }
-         echo implode("\n",$out)."\n";
-         $out=[];
-         if ($ret!=0) {
-            return;
-         }
-
-
-
-
-
-
-
-
-         if (!empty($payload->head_commit) && is_object($payload->head_commit)) {
-            if (!empty($payload->head_commit->modified) && is_array($payload->head_commit->modified)) {
-               if (in_array('composer.json',$payload->head_commit->modified)) {
-                  $line = exec("composer update 2>&1",$out,$ret);
-                  if ($ret!=0) {
-                     echo implode("\n",$out)."\n";
-                     trigger_error("composer update command failed: returned status $ret",E_USER_ERROR);
-                  }
-               }
-               if (in_array('bower.json',$payload->head_commit->modified)) {
-                  $line = exec("cd ".self::REPO_PATH ."; bash -c 'bower install 2>&1'",$out,$ret);
-                  if ($ret!=0) {
-                     echo implode("\n",$out)."\n";
-                     trigger_error("bower install command failed: returned status $ret",E_USER_ERROR);
-                  }
-               }
-            }
-         }
-
-
-
-
-
-
-
-
-
-
-
-
+      }
    }
 };
+

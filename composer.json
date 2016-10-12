@@ -13,9 +13,7 @@
     },
     "autoload": {
         "psr-4": { 
-            "SpyDash\\": "src/SpyDash",
-            "SpyDashRoute\\": "app/SpyDashRoute",
-            "SpyDashWeb\\": "app/SpyDashWeb"
+            "Webhook\\": "src"
          }
     }    
 }
