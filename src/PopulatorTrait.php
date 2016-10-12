@@ -21,7 +21,7 @@ trait PopulatorTrait {
             $object->$p = $input[$p];
          }
       }
-      if ($object instanceof PopulateComplete) $object->populateComplete();
+      if ($object instanceof PopulateListener) $object->populateComplete();
       return $object;
    }
    
@@ -39,8 +39,12 @@ trait PopulatorTrait {
       $object = $this;
       
       $mapProp = (new \ReflectionObject($input))->getProperties(\ReflectionProperty::IS_PUBLIC);
+      
       $mapList = [];
+      
       foreach($mapProp as $v) $mapList[]=$v->getName();
+      
+      unset($v);
       
       foreach($object as $p=>$v) {
          
@@ -49,7 +53,9 @@ trait PopulatorTrait {
          }
          
       }
-      if ($object instanceof PopulateComplete) $object->populateComplete();
+      
+      if ($object instanceof PopulateListener) $object->populateComplete();
+      
       return $object;
       
    }
