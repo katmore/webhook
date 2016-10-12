@@ -3,6 +3,7 @@ use Webhook\Callback;
 use Webhook\Request;
 use Webhook\InvalidRequest;
 use Webhook\Payload;
+use Webhook\UrlCallbackRule;
 
 //ini_set('display_errors',1);
 
@@ -30,7 +31,7 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       echo json_encode($payload,\JSON_PRETTY_PRINT);
       
    }
-});
+},new UrlCallbackRule('https://api.github.com/repos/digital-mgmt/apl'));
 
 register_shutdown_function(function() {
    $last_error = error_get_last();
