@@ -5,5 +5,5 @@ namespace Webhook;
  */
 interface Populatable {
    public function populateFromArray(array $input);
-   public function populateFromObject(object $input);
+   public function populateFromObject($input);
 }
