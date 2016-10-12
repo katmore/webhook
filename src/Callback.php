@@ -42,9 +42,7 @@ class Callback {
       }
       
       
-      if (! call_user_func_array($this->_callback,[$payload]) ) {
-         
-      }
+      call_user_func_array($this->_callback,[$payload]);
    }
    
    /**

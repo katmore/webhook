@@ -10,5 +10,7 @@ class HookConfig implements Populatable  {
    
    public $content_type;
    
+   public $insecure_ssl;
+   
    use PopulatorTrait;
 }
