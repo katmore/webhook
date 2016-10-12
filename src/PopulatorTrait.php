@@ -44,7 +44,7 @@ trait PopulatorTrait {
       
       foreach($object as $p=>$v) {
          
-         if (in_array($p,$mapList)) {
+         if (in_array($p,$mapList,true)) {
             $object->$p = $input->$p;
          }
          
