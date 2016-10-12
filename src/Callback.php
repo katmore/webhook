@@ -81,10 +81,10 @@ class Callback {
       $this->_hubSecret = $hubSecret;
       $this->_callback = $callback;
       foreach($CallbackRule as $v) {
-         if ($v instanceof UrlPayloadCriterion) {
+         if ($v instanceof UrlCallbackRule) {
             $this->_urlRule []= (string) $v;
          }
-         if ($v instanceof EventPayloadCriterion) {
+         if ($v instanceof EventCallbackRule) {
             $this->_eventRule []= (string) $v;
          }
       }
