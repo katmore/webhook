@@ -27,7 +27,7 @@ class Callback {
                break 1;
             }
          }
-         if (!$found_urlRule_match) throw new InvalidRequest("failed to match payload's git repository URL");
+         if (!$found_urlRule_match) throw new InvalidRequest("failed to find a match for the payload's repository URL");
       }
       
       if (count($this->_eventRule)) {
@@ -38,7 +38,7 @@ class Callback {
                break 1;
             }
          }
-         if (!$found_eventRule_match) throw new InvalidRequest("failed to match payload's GitHub-Event type");
+         if (!$found_eventRule_match) throw new InvalidRequest("failed to find a match for the payload's GitHub-Event type");
       }
       
       
