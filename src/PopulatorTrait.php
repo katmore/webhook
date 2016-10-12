@@ -14,7 +14,7 @@ trait PopulatorTrait {
     * @param array $input
     * @return object
     */
-   public function populateFromArray(array $input): object {
+   public function populateFromArray(array $input) {
       $object = $this;
       foreach($object as $p=>$v) {
          if (isset($input[$p])) {
@@ -32,7 +32,7 @@ trait PopulatorTrait {
     * @param object $input 
     * @return object
     */
-   public function populateFromObject(object $input): object {
+   public function populateFromObject($input) {
       
       $object = $this;
       

@@ -26,7 +26,7 @@ abstract class Payload implements Populatable, PopulateListener {
    
    use PopulatorTrait;
    
-   public function populateComplete(): void {
+   public function populateComplete() {
       
       if (!$this->sender instanceof Sender) {
          $this->sender = (new Sender)->populateFromObject($this->sender);
@@ -42,7 +42,7 @@ abstract class Payload implements Populatable, PopulateListener {
       
    }
    
-   public function __construct(object $input) {
+   public function __construct($input) {
       $this->populateFromObject($input);
    }
    

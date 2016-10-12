@@ -4,6 +4,6 @@ namespace Webhook;
  * Interface for populating an object's data from input.
  */
 interface Populatable {
-   public function populateFromArray(array $input): object;
-   public function populateFromObject(object $input): object;
+   public function populateFromArray(array $input);
+   public function populateFromObject(object $input);
 }
