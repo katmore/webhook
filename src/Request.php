@@ -6,6 +6,43 @@ use Webhook\Payload;
 class Request {
    
    /**
+    * Loads a webhook request object from specified paramaters.
+    *    Suitable for use in conjunction with the $_SERVER array.
+    *
+    * @param string $messageBody request message body
+    * @param array $param assoc array of paramaters:<ul>
+    *    <li><b>string $param['HTTP_X_HUB_SIGNATURE']</b> HTTP_X_HUB_SIGNATURE.</li>
+    *    <li><b>string $param['HTTP_X_GITHUB_EVENT']</b> HTTP_X_GITHUB_EVENT.</li>
+    *    <li><b>string $param['CONTENT_TYPE']</b> CONTENT_TYPE. Optional.</li>
+    *    <li><b>string $param['HTTP_X_GITHUB_DELIVERY']</b> HTTP_X_GITHUB_DELIVERY.</li>
+    *    <li><b>string $param['REQUEST_METHOD']</b> REQUEST_METHOD.</li>
+    *    <li><b>string $param['HTTP_USER_AGENT']</b> HTTP_USER_AGENT.</li>
+    * </ul>
+    *
+    * @return \Webhook\Request
+    */
+   public static function load(string $messageBody,array $param=null) {
+      $request = [
+         'HTTP_X_HUB_SIGNATURE'=>'',
+         'HTTP_X_GITHUB_EVENT'=>'',
+         'CONTENT_TYPE'=>'',
+         'HTTP_X_GITHUB_DELIVERY'=>'',
+         'REQUEST_METHOD'=>'',
+         'HTTP_USER_AGENT'=>'',
+      ];
+      if (!empty($param)) {
+         foreach($request as $k=>&$v) {
+            if (isset($param[$k])) $v=$param[$k];
+         }
+      }
+      return new static(
+            $messageBody,$request['HTTP_X_HUB_SIGNATURE'],$request['HTTP_X_GITHUB_EVENT'],
+            $request['CONTENT_TYPE'],$request['HTTP_X_GITHUB_DELIVERY'],
+            $request['REQUEST_METHOD'],$request['HTTP_USER_AGENT']
+            );
+   }
+   
+   /**
     * @var string
     *    The raw payload of this delivery.
     */
@@ -51,43 +88,6 @@ class Request {
     */
    private $_payload;
    
-   /**
-    * Loads a webhook request object from specified paramaters.
-    *    Suitable for use in conjunction with the $_SERVER array.
-    * 
-    * @param string $messageBody request message body
-    * @param array $param assoc array of paramaters:<ul>
-    *    <li><b>string $param['HTTP_X_HUB_SIGNATURE']</b> HTTP_X_HUB_SIGNATURE.</li>
-    *    <li><b>string $param['HTTP_X_GITHUB_EVENT']</b> HTTP_X_GITHUB_EVENT.</li>
-    *    <li><b>string $param['CONTENT_TYPE']</b> CONTENT_TYPE. Optional.</li>
-    *    <li><b>string $param['HTTP_X_GITHUB_DELIVERY']</b> HTTP_X_GITHUB_DELIVERY.</li>
-    *    <li><b>string $param['REQUEST_METHOD']</b> REQUEST_METHOD.</li>
-    *    <li><b>string $param['HTTP_USER_AGENT']</b> HTTP_USER_AGENT.</li>
-    * </ul>
-    * 
-    * @return \Webhook\Request
-    */
-   public static function load(string $messageBody,array $param=null) {
-      $request = [
-         'HTTP_X_HUB_SIGNATURE'=>'',
-         'HTTP_X_GITHUB_EVENT'=>'',
-         'CONTENT_TYPE'=>'',
-         'HTTP_X_GITHUB_DELIVERY'=>'',
-         'REQUEST_METHOD'=>'',
-         'HTTP_USER_AGENT'=>'',
-      ];
-      if (!empty($param)) {
-         foreach($request as $k=>&$v) {
-            if (isset($param[$k])) $v=$param[$k];
-         }
-      }
-      return new static(
-         $messageBody,$request['HTTP_X_HUB_SIGNATURE'],$request['HTTP_X_GITHUB_EVENT'],
-            $request['CONTENT_TYPE'],$request['HTTP_X_GITHUB_DELIVERY'],
-            $request['REQUEST_METHOD'],$request['HTTP_USER_AGENT']
-      );
-   }
-   
    public function __construct(
          string $messageBody,string $hubSignature,string $gitHubEvent,
          string $contentType='',string $gitHubDelivery='',
@@ -119,7 +119,7 @@ class Request {
       $payload = null;
       $eventSubns = "";
       if (!empty($this->_gitHubEvent) && !empty($bodyObject)) {
-         $eventSubns = ucwords($this->_gitHubEvent)."Event";
+         $eventSubns = str_replace(" ","",ucwords(str_replace("_"," ",$this->_gitHubEvent)))."Event";
          $payload = __NAMESPACE__ . '\Payload\\'.$eventSubns;
          if (class_exists($payload)) {
             $this->_payload = new $payload($bodyObject);
@@ -130,7 +130,7 @@ class Request {
       
       if (empty($this->_payload)) {
          
-         throw new InvalidRequest("could not create payload object for $eventSubns (event: ".$this->_gitHubEvent.")");
+         throw new InvalidRequest("no payload object is defined for $eventSubns (event: ".$this->_gitHubEvent.")");
          
       }
    }
