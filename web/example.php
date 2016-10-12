@@ -16,6 +16,8 @@ $callback = new Callback($config['Secret'],function( ) use (&$config) {
    
    $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
    
+   //$line = exec('svn up '.$config['RepoPath'].' 2>&1',$out,$ret);
+   
    if ($ret!=0) http_response_code(500);
    
    echo implode("\n",$out)."\n";
