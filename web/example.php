@@ -3,6 +3,8 @@ use Webhook\Callback;
 use Webhook\Request;
 use Webhook\InvalidRequest;
 
+//ini_set('display_errors','1');
+
 require __DIR__."/../vendor/autoload.php";
 
 $config['Secret'] = 'My Secret';
