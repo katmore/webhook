@@ -26,6 +26,26 @@ class Callback {
                $found_urlRule_match = true;
                break 1;
             }
+            if ($payload->repository->html_url===$this->_urlRule) {
+               $found_urlRule_match = true;
+               break 1;
+            }
+            if ($payload->repository->git_url===$this->_urlRule) {
+               $found_urlRule_match = true;
+               break 1;
+            }
+            if ($payload->repository->ssh_url===$this->_urlRule) {
+               $found_urlRule_match = true;
+               break 1;
+            }
+            if ($payload->repository->clone_url===$this->_urlRule) {
+               $found_urlRule_match = true;
+               break 1;
+            }
+            if ($payload->repository->svn_url===$this->_urlRule) {
+               $found_urlRule_match = true;
+               break 1;
+            }
          }
          if (!$found_urlRule_match) throw new InvalidRequest("failed to find a match for the payload's repository URL");
       }
