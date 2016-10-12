@@ -15,7 +15,7 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
    
    header('Content-Type:text/plain');
    
-   if ($payload->getEvent()=='push') {
+   if ($payload instanceof Payload\PushEvent) {
       
       $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
       
@@ -25,12 +25,19 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       
       echo implode("\n",$out)."\n";
       
-      return !$ret;
+   } elseif ($payload instanceof Payload\PingEvent) {
       
-   } elseif ($payload->getEvent()=='ping') { 
+      echo json_encode($payload,\JSON_PRETTY_PRINT);
       
-      
-      
+   }
+});
+
+register_shutdown_function(function() {
+   $last_error = error_get_last();
+   if ($last_error && isset($last_error['type'])) {
+      if (!in_array($last_error['type'],[E_DEPRECATED,E_WARNING,E_NOTICE,E_RECOVERABLE_ERROR,E_USER_DEPRECATED,E_USER_NOTICE,E_USER_WARNING])) {
+         http_response_code (500);
+      }
    }
 });
 
