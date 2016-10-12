@@ -1,7 +1,7 @@
 <?php
 namespace Webhook;
 
-class InvalidDelivery extends \Exception {
+class InvalidRequest extends \Exception {
    public function getReason() {
       return $this->_reason;
    }

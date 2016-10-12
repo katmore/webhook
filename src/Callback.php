@@ -15,7 +15,7 @@ class Callback {
    public function validateRequest(string $hubSignature,string $rawPayload, Payload $payload) {
       list($algo, $hash) = explode('=', $hubSignature, 2) + ['', ''];
       if ($hash !== hash_hmac($algo, $rawPayload, $this->_hubSecret)) {
-         return false;
+         return new InvalidRequest("secret validation failed");
       }
       
       
@@ -27,7 +27,7 @@ class Callback {
                break 1;
             }
          }
-         if (!$found_urlRule_match) return false;
+         if (!$found_urlRule_match) throw new InvalidRequest("failed to match payload's git repository URL");
       }
       
       if (count($this->_eventRule)) {
@@ -38,11 +38,13 @@ class Callback {
                break 1;
             }
          }
-         if (!$found_eventRule_match) return false;
+         if (!$found_eventRule_match) throw new InvalidRequest("failed to match payload's GitHub-Event type");
       }
       
       
-      call_user_func_array($this->_callback,[$payload]);
+      if (! call_user_func_array($this->_callback,[$payload]) ) {
+         
+      }
    }
    
    /**

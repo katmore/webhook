@@ -1,24 +1,35 @@
 <?php
 use Webhook\Callback;
-use Webhook\Delivery;
+use Webhook\Request;
+use Webhook\InvalidRequest;
 
-require(__DIR__."/../vendor/autoload.php");
+require __DIR__."/../vendor/autoload.php";
 
-$config = new Callback('Webhook Shared Secret',function( ) {
-   $line = exec('cd /path/to/my/repo && git pull 2>&1',$out,$ret);
+$config['Secret'] = 'My Secret';
+$config['RepoPath'] = '/path/to/my/repo';
+
+header('Content-Type:text/plain');
+
+$callback = new Callback($config['Secret'],function( ) use (&$config) {
+   
+   $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
+   
    if ($ret!=0) http_response_code(500);
+   
    echo implode("\n",$out)."\n";
+   
+   return !$ret;
 });
 
-$delivery = new Delivery(
-      file_get_contents('php://input'), //messageBody
-      $_SERVER["CONTENT_TYPE"], //contentType
-      $_SERVER["HTTP_X_GITHUB_EVENT"], //gitHubEvent
-      $_SERVER["HTTP_X_HUB_SIGNATURE"], //hubSignature
-      $_SERVER["HTTP_X_GITHUB_DELIVERY"], //gitHubDelivery
-      $_SERVER["REQUEST_METHOD"], //requestMethod
-      $_SERVER["HTTP_USER_AGENT"] //userAgent
-);
+try {
+   $request = Request::load(
+         file_get_contents('php://input'),
+         isset($_SERVER)?$_SERVER:[]
+         );
 
-$config->validateRequest($delivery->getHubSignature(), $delivery->getMessageBody(), $delivery->getPayload());
+   $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
+} catch(InvalidRequest $e) {
+   http_response_code(500);
+   echo "Invalid Request: ".$e->getMessage();
+}
 
