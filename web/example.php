@@ -11,6 +11,7 @@ require __DIR__."/../vendor/autoload.php";
 
 $config['Secret'] = 'My Secret';
 $config['RepoPath'] = '/path/to/my/repo';
+$config['RepoUrl'] = 'https://example.com/repos/my-org/my-repo';
 
 $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
    
@@ -31,7 +32,7 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       echo json_encode($payload,\JSON_PRETTY_PRINT);
       
    }
-},new UrlCallbackRule('https://api.github.com/repos/digital-mgmt/apl'));
+},new UrlCallbackRule($config['RepoUrl']));
 
 register_shutdown_function(function() {
    $last_error = error_get_last();
