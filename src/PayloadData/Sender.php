@@ -44,5 +44,6 @@ class Sender implements Populatable {
     * @var string
     */
    public $site_admin;
+   
    use PopulatorTrait;
 }

@@ -25,7 +25,7 @@ class PingEvent extends Payload {
     */
    public $hook;
    
-   public function populateComplete(): void {
+   public function populateComplete() {
       parent::populateComplete();
       
       if ((!$this->hook instanceof Hook) && is_object($this->hook)) {

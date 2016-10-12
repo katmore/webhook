@@ -45,7 +45,7 @@ class Repository implements Populatable,PopulateListener {
    
    use PopulatorTrait;
    
-   public function populateComplete(): void {
+   public function populateComplete() {
       
       if (!$this->owner instanceof RepositoryOwner) {
          $this->owner = (new RepositoryOwner)->populateFromObject($this->owner);

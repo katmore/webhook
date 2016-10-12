@@ -3,10 +3,10 @@ namespace Webhook\PayloadData;
 
 use Webhook\Populatable;
 use Webhook\PopulatorTrait;
-use Webhook\PopulateCompleteListener;
+use Webhook\PopulateListener;
 use Webhook\PayloadData\HookConfig;
 
-class Hook implements Populatable,PopulateCompleteListener  {
+class Hook implements Populatable,PopulateListener  {
    
    /**
     * @var string The webhook's id.
@@ -50,7 +50,7 @@ class Hook implements Populatable,PopulateCompleteListener  {
    
    use PopulatorTrait;
    
-   public function populateComplete(): void {
+   public function populateComplete() {
       
       if ((!$this->config instanceof HookConfig) && is_object($this->config)) {
          $this->config = (new HookConfig)->populateFromObject($this->config);

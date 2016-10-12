@@ -33,7 +33,7 @@ trait CommitTrait {
     */
    public $timestamp;
    
-   public function populateComplete(): void {
+   public function populateComplete() {
       
       if (!$this->author instanceof CommitAuthor) {
          $this->author = (new CommitAuthor)->populateFromObject($this->author);
