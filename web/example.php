@@ -12,26 +12,43 @@ require __DIR__."/../vendor/autoload.php";
 $config['Secret'] = 'My Secret';
 $config['RepoPath'] = '/path/to/my/repo';
 $config['RepoUrl'] = 'https://example.com/my-org/my-repo';
+$config['RepoType'] = 'git'; //'git' or 'svn' (works in the callback below)
 
 $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
    
    if ($payload instanceof Payload\PushEvent) {
       
+      if ($config['RepoType']=='git') {
+         
+         $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
+      
+      } else if ($config['RepoType']=='svn') {
+         
+         $line = exec('svn up '.$config['RepoPath'].' 2>&1',$out,$ret);
+      
+      }
+      
       header('Content-Type:text/plain');
-      
-      $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
-      
-      //$line = exec('svn up '.$config['RepoPath'].' 2>&1',$out,$ret);
-      
       if ($ret!=0) http_response_code(500);
       
       echo implode("\n",$out)."\n";
       
    } elseif ($payload instanceof Payload\PingEvent) {
       
-      header('Content-Type:application/json;charset=utf-8');
+      if ($config['RepoType']=='git') {
+          
+         $line = exec('cd '.$config['RepoPath'].' && git status 2>&1',$out,$ret);
       
-      echo json_encode($payload,\JSON_PRETTY_PRINT);
+      } else if ($config['RepoType']=='svn') {
+          
+         $line = exec('svn info '.$config['RepoPath'].' 2>&1',$out,$ret);
+      
+      }
+      
+      header('Content-Type:text/plain');
+      if ($ret!=0) http_response_code(500);
+      
+      echo implode("\n",$out)."\n";
       
    }
 },new UrlCallbackRule($config['RepoUrl']));
