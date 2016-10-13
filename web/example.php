@@ -29,7 +29,7 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       
    } elseif ($payload instanceof Payload\PingEvent) {
       
-      header('Content-type:application/json;charset=utf-8');
+      header('Content-Type:application/json;charset=utf-8');
       
       echo json_encode($payload,\JSON_PRETTY_PRINT);
       
