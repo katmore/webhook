@@ -67,7 +67,9 @@ try {
          file_get_contents('php://input'),
          isset($_SERVER)?$_SERVER:[]
          );
-
+   if ($request->getRequestMethod()!=='POST') {
+      throw new InvalidRequest("requestMethod must be POST");
+   }
    $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
 } catch(InvalidRequest $e) {
    http_response_code(500);
