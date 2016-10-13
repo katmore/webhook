@@ -11,13 +11,13 @@ require __DIR__."/../vendor/autoload.php";
 
 $config['Secret'] = 'My Secret';
 $config['RepoPath'] = '/path/to/my/repo';
-$config['RepoUrl'] = 'https://example.com/repos/my-org/my-repo';
+$config['RepoUrl'] = 'https://example.com/my-org/my-repo';
 
 $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
    
-   header('Content-Type:text/plain');
-   
    if ($payload instanceof Payload\PushEvent) {
+      
+      header('Content-Type:text/plain');
       
       $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
       
@@ -28,6 +28,8 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       echo implode("\n",$out)."\n";
       
    } elseif ($payload instanceof Payload\PingEvent) {
+      
+      header('Content-Type:application/json');
       
       echo json_encode($payload,\JSON_PRETTY_PRINT);
       
