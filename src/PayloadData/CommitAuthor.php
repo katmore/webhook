@@ -8,7 +8,7 @@ use Webhook\PopulatorTrait;
  * Commit author data of the Events API payload
  * @see https://developer.github.com/v3/activity/events/types/#pushevent
  */
-abstract class CommitAuthor implements Populatable {
+class CommitAuthor implements Populatable {
     
    /**
     * @var string
