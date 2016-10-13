@@ -21,5 +21,5 @@ abstract class CallbackRule {
       }
       return "";
    }
-   abstract public function __construct(string $criterionValue);
+   abstract public function __construct(string $ruleValue);
 }

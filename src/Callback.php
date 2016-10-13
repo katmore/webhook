@@ -22,27 +22,27 @@ class Callback {
       if (count($this->_urlRule)) {
          $found_urlRule_match=false;
          foreach($this->_urlRule as $url) {
-            if ($payload->repository->url===$this->_urlRule) {
+            if ($payload->repository->url===$url) {
                $found_urlRule_match = true;
                break 1;
             }
-            if ($payload->repository->html_url===$this->_urlRule) {
+            if ($payload->repository->html_url===$url) {
                $found_urlRule_match = true;
                break 1;
             }
-            if ($payload->repository->git_url===$this->_urlRule) {
+            if ($payload->repository->git_url===$url) {
                $found_urlRule_match = true;
                break 1;
             }
-            if ($payload->repository->ssh_url===$this->_urlRule) {
+            if ($payload->repository->ssh_url===$url) {
                $found_urlRule_match = true;
                break 1;
             }
-            if ($payload->repository->clone_url===$this->_urlRule) {
+            if ($payload->repository->clone_url===$url) {
                $found_urlRule_match = true;
                break 1;
             }
-            if ($payload->repository->svn_url===$this->_urlRule) {
+            if ($payload->repository->svn_url===$url) {
                $found_urlRule_match = true;
                break 1;
             }
@@ -53,7 +53,7 @@ class Callback {
       if (count($this->_eventRule)) {
          $found_eventRule_match=false;
          foreach($this->_eventRule as $event) {
-            if ($payload->getEvent()===$this->_eventRule) {
+            if ($payload->getEvent()===$event) {
                $found_eventRule_match = true;
                break 1;
             }
