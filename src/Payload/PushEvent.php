@@ -55,7 +55,7 @@ class PushEvent extends Payload {
     */
    public $pusher;
    
-   public function populateComplete(): void {
+   public function populateComplete() {
       parent::populateComplete();
       
       foreach($this->commits as &$commit) {
