@@ -4,6 +4,7 @@ namespace Webhook\Payload;
 use Webhook\Payload;
 use Webhook\PayloadData\Commit;
 use Webhook\PayloadData\HeadCommit;
+use Webhook\PayloadData\Pusher;
 
 /**
  * Payload data provided by PushEvent
