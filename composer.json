@@ -1,11 +1,11 @@
 {
    "name": "katmore/webhook",
-   "description" : "Github webhook implementation",
+   "description" : "Create webservice end-points for Github webhooks.",
    "homepage":"https://github.com/katmore/webhook",
-   "dist": {
-        "url": "https://github.com/katmore/webhook",
-        "type": "git"
-    },
+    "license": [
+       "MIT",
+       "GPL-3.0+"
+    ],
     "require": {
         "php" : ">=7.0.1",
         "ext-hash" : "*",

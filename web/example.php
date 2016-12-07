@@ -1,18 +1,39 @@
 <?php
+/**
+ * webservice endpoint that updates a git or svn repo on the local system in response to a 'push' event Github webhook.
+ * 
+ */
 use Webhook\Callback;
 use Webhook\Request;
 use Webhook\InvalidRequest;
 use Webhook\Payload;
 use Webhook\UrlCallbackRule;
 
-//ini_set('display_errors',1);
-
 require __DIR__."/../vendor/autoload.php";
 
-$config['Secret'] = 'My Secret';
-$config['RepoPath'] = '/path/to/my/repo';
+/*
+ * string $config['RepoUrl']
+ *    GitHub repository URL: i.e: https://github.com/my-org/my-repo
+ */
 $config['RepoUrl'] = 'https://example.com/my-org/my-repo';
-$config['RepoType'] = 'git'; //'git' or 'svn' (works in the callback below)
+
+/*
+ * string $config['Secret']
+ *    The "Secret" configured in Github for the webhook.
+ */
+$config['Secret'] = 'My Secret';
+
+/*
+ * string $config['RepoPath']
+ *    The local system path to the repository
+ */
+$config['RepoPath'] = '/path/to/my/repo';
+
+/*
+ * string $config['RepoType']
+ *    The type of local system repository, this end-point can handle either 'git' or 'svn'.
+ */
+$config['RepoType'] = 'git';
 
 $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
    
@@ -32,6 +53,7 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       if ($ret!=0) http_response_code(500);
       
       echo implode("\n",$out)."\n";
+      unset($out);
       
    } elseif ($payload instanceof Payload\PingEvent) {
       
@@ -49,6 +71,7 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       if ($ret!=0) http_response_code(500);
       
       echo implode("\n",$out)."\n";
+      unset($out);
       
    }
 },new UrlCallbackRule($config['RepoUrl']));

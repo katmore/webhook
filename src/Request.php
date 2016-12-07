@@ -88,6 +88,17 @@ class Request {
     */
    private $_payload;
    
+   /**
+    * @param string $messageBody
+    * @param string $hubSignature
+    * @param string $gitHubEvent
+    * @param string $contentType Optional.
+    * @param string $gitHubDelivery Optional.
+    * @param string $requestMethod Optional.
+    * @param string $userAgent Optional.    
+    * 
+    * @throws \Webhook\InvalidRequest if invalid value specified for hubSignature, or gitHubEvent;  
+    */
    public function __construct(
          string $messageBody,string $hubSignature,string $gitHubEvent,
          string $contentType='',string $gitHubDelivery='',
@@ -123,15 +134,11 @@ class Request {
          $payload = __NAMESPACE__ . '\Payload\\'.$eventSubns;
          if (class_exists($payload)) {
             $this->_payload = new $payload($bodyObject);
+         } else {
+            $this->_payload = new Payload\Event($bodyObject, $this->_gitHubEvent);
          }
       } else {
          throw new InvalidRequest("missing gitHubEvent");
-      }
-      
-      if (empty($this->_payload)) {
-         
-         throw new InvalidRequest("no payload object is defined for $eventSubns (event: ".$this->_gitHubEvent.")");
-         
       }
    }
    
