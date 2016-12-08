@@ -7,8 +7,8 @@ Create webservice end-points for Github webhooks.
 The Webhook Project facilitates handling of from Github webhooks. It may be used as a [wrapper that can be integrated to other projects](#webhookrequest-and-webhookpayload-classes); or, as a solution to provide full webservice end-points (see the [end-point installer script](#endpoint-installer-script) or the [end-point example](#using-the-provided-end-point-example)).
 
 ##Usage
-###Class autoloader
-Class autoloading is required for any usage and can be done with Composer.
+###Class autoloading
+PSR-4 compliant class autoloading is required for any usage; this can be done with Composer.
   ```bash
 composer require katmore/webhook
   ```
@@ -23,9 +23,8 @@ The `--help` switch will provide details on more advanced usage (such as quiet a
 php bin/add-endpoint.php --help
 ```
 
-###Webhook/Request and Webhook/Payload classes
-The [end-point example](web/endpoint-example.php) and [installer script](bin/add-endpoint.php) scripts are provided for convenience only, and are not required.
-Customized integration into any project is facilitated by using the Webhook/Request class to populate a Webhook/Payload object:
+###Webhook\Request and Webhook\Payload classes
+The **"Webhook\Request"** class and **"Webhook\Payload"** child objects serve as the main working points for using this project as a wrapper. The **Request** class facilitates dealing with a Github Webhook request by interpreting the message body and related HTTP headers. The **Request** constructor will populate a **Payload** object with a class that corresponds to the Webhook "Event Type". It searches for a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the GitHub event type within the namespace **Webhoook\Payload**. For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is populated for a [PushEvent PushEvent Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent)). If no Payload class is defined for a particular event, a [Webhook\Payload\Event object](src/Payload/Event.php) is populated by default.
 
 ```php
 /*
@@ -71,8 +70,8 @@ $payload = $request->getPayload();
 var_dump($payload);
 ```
 ###Validating a request's "Hub Signature"
-When doing customized integration, it is highly important to note that the "Hub Signature" should be validated against the shared 'Secret' configured for the Webhook.
-The following is an example of doing this validation with the native php `hash_hmac()` function.
+It is critical that at some point in the handling of a Webhook request that the "Hub Signature" be validated against the shared "Secret". The (end-point installer)[#endpoint-installer-script] and (end-point example)[#endpoint-installer-script] both accomplish this by using the **Callback::validateRequest()** method of the [**Webhook\Callback** class](src/Callback.php). Depending on the project, however, it may be more practical to implement validation natively with the [php `hash_hmac()` function](http://php.net/manual/en/function.hash-hmac.php).
+
 ```php
 /*
  * prepare the messageBody; for example, by reading from the php input stream
