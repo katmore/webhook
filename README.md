@@ -4,7 +4,7 @@ Wrappers to handle [Github Webhook requests](https://developer.github.com/webhoo
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
 ##Description
-The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It provides [class wrappers](#wrapper-classes) for integration and an optional [end-point installer script](#end-point-installer-script) for a self-contained solution that should be easy to deploy.
+The Webhook Project facilitates workflow integration of Github Webhook requests. It provides [class wrappers](#wrapper-classes) for existing projects and an optional [end-point installer script](#end-point-installer-script) for a self-contained solution that is easy to deploy.
 
 ##Requirements
  * PHP 7.0 or higher
