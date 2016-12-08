@@ -4,17 +4,17 @@ Wrapper and webservice end-points to handle [Github Webhook requests](https://de
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
 ##Description
-The Webhook Project facilitates handling of from Github webhooks. It may be used as a [wrapper that can be integrated to other projects](#webhookrequest-and-webhookpayload-classes); or, as a solution to provide full webservice end-points (see the [end-point installer script](#endpoint-installer-script) or the [end-point example](#using-the-provided-end-point-example)).
+The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It can be used as a [class wrapper](#webhookrequest-and-webhookpayload-classes) for integration into other projects; or, as a self-contained solution using the included [end-point installer](#endpoint-installer-script).
 
 ##Usage
 ###Class autoloading
-PSR-4 compliant class autoloading is required for any usage; this can be done with Composer.
+PSR-4 compliant class autoloading is generally necessary for any usage; this can be done with Composer.
   ```bash
 composer require katmore/webhook
   ```
 
 ###Endpoint Installer Script
-A php cli script [bin/add-endpoint.php](bin/add-endpoint.php) is provided for creating a Webhook that responds the Push Event on your repository by updating a local repository. Basic usage via command line will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
+A php cli script [bin/add-endpoint.php](bin/add-endpoint.php) is provided for creating a Webhook that responds the **PushEvent** on your repository by updating a local repository. Basic usage via command line will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
 ```bash
 php bin/add-endpoint.php
 ```
