@@ -2,4 +2,4 @@
 !/.gitignore
 composer.lock
 /vendor/
-web/test.php
+web/endpoint/
