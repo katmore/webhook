@@ -12,7 +12,7 @@ return(function() {
       
       const HELP_LABEL = "Webhook Project: https://github.com/katmore/webhook";
        
-      const USAGE = '[--help [--quiet | --verbose] [--non-interactive] [--repo-url=<Repo URL> [--repo-path=<path to local repository> [--repo-type=<"svn"|"git">] [--hub-secret=<Github Webhook Secret>]]] [--autoload-path=<path to vendor/autoload.php> [--web-endpoint-dir=<path to web/endpoint directory>]]]';
+      const USAGE = '[--help [--quiet | --verbose] [--non-interactive] [--repo-url=<Repo URL> [--repo-path=<path to local repository> [--repo-type=<"svn"|"git">] [--hub-secret=<Github Webhook Secret>]]] [--autoload-path=<path to vendor/autoload.php> [--web-endpoint-dir=<path to web/endpoint directory>] [--endpoint-script=<endpoint script name>]]]';
       
       const FALLBACK_REPO_TYPE = 'git';
       
@@ -91,7 +91,7 @@ $autoloadHelp
 
 $webEndpointDirHelp
 
---web-endpoint-script (optional)
+--endpoint-script (optional)
    Name of webservice endpoint script to create in web-endpoint-dir (ie: reponame.php)
    default value: <repository 'name'>.php
 EOT;
@@ -336,7 +336,7 @@ EOT;
             'hub-secret'=>'',
             'autoload-path'=>(string) realpath(self::_getFallbackAutoload()),
             'web-endpoint-dir'=>(string) realpath(self::_getFallbackWebEndpointDir()),
-            'web-endpoint-script'=>'',
+            'endpoint-script'=>'',
          ];
          
          foreach($endpointCfg as $k=>&$v) {
@@ -438,8 +438,8 @@ EOT;
          
          if ($error) return $this->_exitStatus = 1;
          
-         if (!empty(getopt("",["web-endpoint-script::",])['web-endpoint-script'])) {
-            $webEndpointScript=getopt("",["web-endpoint-script::",])['web-endpoint-script'];
+         if (!empty(getopt("",["endpoint-script::",])['endpoint-script'])) {
+            $webEndpointScript=getopt("",["endpoint-script::",])['endpoint-script'];
          } else {
             $webEndpointScript = pathinfo(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH),\PATHINFO_DIRNAME)."/".pathinfo(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH),\PATHINFO_BASENAME);
          }
@@ -451,7 +451,7 @@ EOT;
          $scriptDir = pathinfo($webEndpointPath,\PATHINFO_DIRNAME);
          if (!is_dir($scriptDir)) {
             if (!mkdir($scriptDir,0777,true)) {
-               self::_showErrLine(["could not create subdir for web-endpoint-script: $scriptDir"]);
+               self::_showErrLine(["could not create subdir for endpoint-script: $scriptDir"]);
             }
          }
          
