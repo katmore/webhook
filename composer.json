@@ -1,6 +1,6 @@
 {
    "name": "katmore/webhook",
-   "description" : "Create webservice end-points for Github webhooks.",
+   "description" : "Wrapper and webservice end-points to handle Github Webhook requests.",
    "homepage":"https://github.com/katmore/webhook",
     "license": [
        "MIT",
