@@ -14,7 +14,7 @@ composer require katmore/webhook
   ```
 
 ###Endpoint Installer Script
-The script [bin/add-endpoint.php](bin/add-endpoint.php) is provided for creating a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository. It is a php cli script; when it is invoking it via command line without any arguments it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
+The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) is provided for creating a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository. When invoked without any arguments it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
 ```bash
 php bin/add-endpoint.php
 ```
