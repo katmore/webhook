@@ -3,13 +3,6 @@
  * webservice endpoint that updates a git or svn repo on the local system in response to a 'push' event Github webhook.
  * 
  */
-use Webhook\Callback;
-use Webhook\Request;
-use Webhook\InvalidRequest;
-use Webhook\Payload;
-use Webhook\UrlCallbackRule;
-
-require __DIR__."/../vendor/autoload.php";
 
 /*
  * string $config['RepoUrl']
@@ -34,6 +27,14 @@ $config['RepoPath'] = '/path/to/my/repo';
  *    The type of local system repository, this end-point can handle either 'git' or 'svn'.
  */
 $config['RepoType'] = 'git';
+
+use Webhook\Callback;
+use Webhook\Request;
+use Webhook\InvalidRequest;
+use Webhook\Payload;
+use Webhook\UrlCallbackRule;
+
+require __DIR__."/../vendor/autoload.php";
 
 $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
    
