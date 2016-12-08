@@ -76,12 +76,19 @@ At some point in the handling of a Webhook request it is critical that the "Hub 
 
 ```php
 /*
- * prepare the messageBody; for example, by reading from the php input stream
+ * the 'Secret' field corresponding to the expected Webhook request
+ */
+$hubSecret = "My Secret";
+
+/*
+ * obtain the messageBody; in this case, by reading from the php input stream
  */
 $messageBody = file_get_contents('php://input');
 
+/*
+ * obtain the signature via HTTP header
+ */
 $hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
-$hubSecret = "My Secret";
 
 /*
  * validate the signature
