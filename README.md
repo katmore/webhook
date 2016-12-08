@@ -1,5 +1,5 @@
 #Webhook
-Create webservice end-points for Github webhooks.
+Wrapper and webservice end-points to handle Github Webhook requests.
 
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
