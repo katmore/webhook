@@ -25,7 +25,7 @@ php bin/add-endpoint.php --help
 ```
 
 ###Webhook/Request and Webhook/Payload classes
-The [end-point example](bin/add-endpoint.php) and [installer script](web/endpoint-example.php) scripts are provided for convenience only, and are not required.
+The [end-point example](web/endpoint-example.php) and [installer script](bin/add-endpoint.php) scripts are provided for convenience only, and are not required.
 Customized integration into any project is facilitated by using the Webhook/Request class to populate a Webhook/Payload object:
 
 ```php
@@ -72,7 +72,7 @@ $payload = $request->getPayload();
 var_dump($payload);
 ```
 ###Validating a request's "Hub Signature"
-It is highly recomended that you validate the "Hub Signature" against the shared 'Secret' configured for the Webhook.
+When doing customized integration, it is highly important to note that the "Hub Signature" should be validated against the shared 'Secret' configured for the Webhook.
 The following is an example of doing this validation with the native php `hash_hmac()` function.
 ```php
 /*
@@ -105,7 +105,7 @@ cp web/endpoint-example.php web/my-org/my-repo.php
      * change the value of `$config['RepoUrl']` to your GitHub repository URL:
      
      ```php
-$config['RepoUrl'] = 'https://github.com/my-organization/my-repo.php';
+$config['RepoUrl'] = 'https://github.com/my-organization/my-repo';
    ```
      * change the value of `$config['Secret']` to the "Secret" configured in Github for the webhook:
      
