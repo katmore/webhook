@@ -45,7 +45,7 @@ $hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
 $gitHubEvent = $_SERVER['HTTP_X_GITHUB_EVENT'];
 
 /*
- * instiantate a Webhook/Request object...
+ * instiantate a Webhook\Request object...
  */
 $request = new \Webhook\Request($messageBody, $hubSignature, $gitHubEvent);
 
