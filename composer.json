@@ -1,6 +1,6 @@
 {
    "name": "katmore/webhook",
-   "description" : "Wrapper and webservice end-points to handle Github Webhook requests.",
+   "description" : "Wrappers and webservice to handle GitHub Webhook requests.",
    "homepage":"https://github.com/katmore/webhook",
     "license": [
        "MIT",
