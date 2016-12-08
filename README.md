@@ -8,7 +8,7 @@ The Webhook Project facilitates the usage of Github Webhook requests into a work
 
 ##Usage
 ###Class autoloading
-PSR-4 compliant class autoloading is generally necessary for any usage; this can be done with Composer.
+Class autoloading is generally necessary; example using Composer:
   ```bash
 composer require katmore/webhook
   ```
@@ -97,7 +97,7 @@ if ($hash !== hash_hmac($algo, $messageBody, $hubSecret)) {
 
 ###Using the provided end-point example
 
-An end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php). Out of the box, this example responds to a 'push' event by performing the 'pull' or 'update' commands on a local git or svn repo as appropriate. It also responds to a 'ping' event with a success message. For added safety, this example also validates the "Hub Signature" against the shared Webhook "Secret" as recommended.
+An end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php) which responds to a **PushEvent** by invoking 'pull' or 'update' commands on a local git or svn repository as appropriate. It also responds to a a **PingEvent** with a success message.
 
    * copy the provided [web/endpoint-example.php](web/endpoint-example.php)...
    
