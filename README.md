@@ -8,15 +8,25 @@ The Webhook Project facilitates convenient creation of RESTful end-points to res
 For example, the [`Callback` class](src/Callback.php) validates that the webhook callback provided the same "Secret" you expected from when you initially set up a repository webhook.
 
 ##Usage
-###Installation
-
+###Class autoloader
+Class autoloading is required for any usage. This can be done with Composer.
   ```bash
 composer require katmore/webhook
   ```
 
+###Endpoint Installer Script
+A php cli script [bin/add-endpoint.php](bin/add-endpoint.php) is provided for creating a Webhook that responds the Push Event on your repository by updating a local repository. Basic usage via command line will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
+```bash
+php bin/add-endpoint.php
+```
+The `--help` switch will provide details on more advanced usage (such as quiet and non-interactive modes).
+```bash
+php bin/add-endpoint.php --help
+```
+
 ###Webhook/Request and Webhook/Payload classes
-The most basic usage of the Webhook project is by creating a Webhook/Request object.
-This will result in a Webhook/Payload object.
+The [end-point example](bin/add-endpoint.php) and [installer script](web/endpoint-example.php) scripts are provided for convenience only, and are not required.
+Customized integration into any project is facilitated by using the Webhook/Request class to populate a Webhook/Payload object:
 
 ```php
 /*
@@ -82,20 +92,20 @@ if ($hash !== hash_hmac($algo, $messageBody, $hubSecret)) {
 }
 ```
 
-###Webservice end-point example
+###Using the provided end-point example
 
-A end-point example is provided at [web/example.php](web/example.php). Out of the box, this example responds to a 'push' event by performing the 'pull' or 'update' commands on a local git or svn repo as appropriate. It also responds to a 'ping' event with a success message. For added safety, this example also validates the "Hub Signature" against the shared Webhook "Secret" as recommended.
+A end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php). Out of the box, this example responds to a 'push' event by performing the 'pull' or 'update' commands on a local git or svn repo as appropriate. It also responds to a 'ping' event with a success message. For added safety, this example also validates the "Hub Signature" against the shared Webhook "Secret" as recommended.
 
-   * copy the provided [web/example.php](web/example.php)...
+   * copy the provided [web/endpoint-example.php](web/endpoint-example.php)...
    
    ```bash
-cp web/example.php web/my-end-point.php
+cp web/endpoint-example.php web/my-org/my-repo.php
     ```
-   * edit "my-end-point.php" to specify configuration...
+   * edit "web/my-org/my-repo.php" to specify configuration...
      * change the value of `$config['RepoUrl']` to your GitHub repository URL:
      
      ```php
-$config['RepoUrl'] = 'https://github.com/my-organization/my-repo';
+$config['RepoUrl'] = 'https://github.com/my-organization/my-repo.php';
    ```
      * change the value of `$config['Secret']` to the "Secret" configured in Github for the webhook:
      
