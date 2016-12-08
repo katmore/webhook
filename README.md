@@ -24,7 +24,7 @@ php bin/add-endpoint.php --help
 ```
 
 ###Webhook\Request and Webhook\Payload classes
-The **"Webhook\Request"** class and **"Webhook\Payload"** child objects serve as the main working points for using this project as a wrapper. The **Request** class facilitates dealing with a Github Webhook request by interpreting the message body and related HTTP headers. The **Request** constructor will populate a **Payload** object with a class that corresponds to the Webhook "Event Type". It searches for a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the GitHub event type within the namespace **Webhoook\Payload**. For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is populated for a [PushEvent PushEvent Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent)). If no Payload class is defined for a particular event, a [Webhook\Payload\Event object](src/Payload/Event.php) is populated by default.
+To use this project as a wrapper, the main topics of focus will be the **"Webhook\Request"** class and **"Webhook\Payload"** child objects. The **Request** class facilitates dealing with a Github Webhook request by interpreting the message body and related HTTP headers. The **Request** constructor will create and populate a **Payload** child class with a name that corresponds to the Webhook "Event Type". It searches for the existence of a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the [GitHub Event Type](https://developer.github.com/v3/activity/events/types) within the namespace [**Webhoook\Payload**](src/Payload). For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is created and populated for a [PushEvent PushEvent Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent)). If no Payload class is defined for a particular event, a [Webhook\Payload\Event object](src/Payload/Event.php) is populated by default. If successful, the **Payload** object is available from via the **Webhook\Request::getPayload()** method as detailed in the example below:
 
 ```php
 /*
@@ -82,17 +82,22 @@ $hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
 $hubSecret = "My Secret";
 
 /*
- * validate the secret
+ * validate the signature
  */
 list($algo, $hash) = explode('=', $hubSignature, 2) + ['', ''];
 if ($hash !== hash_hmac($algo, $messageBody, $hubSecret)) {
+   echo "Invalid Signature!";
    return;
 }
+
+/*
+ * continue doing stuff....
+ */
 ```
 
 ###Using the provided end-point example
 
-A end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php). Out of the box, this example responds to a 'push' event by performing the 'pull' or 'update' commands on a local git or svn repo as appropriate. It also responds to a 'ping' event with a success message. For added safety, this example also validates the "Hub Signature" against the shared Webhook "Secret" as recommended.
+An end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php). Out of the box, this example responds to a 'push' event by performing the 'pull' or 'update' commands on a local git or svn repo as appropriate. It also responds to a 'ping' event with a success message. For added safety, this example also validates the "Hub Signature" against the shared Webhook "Secret" as recommended.
 
    * copy the provided [web/endpoint-example.php](web/endpoint-example.php)...
    
