@@ -13,7 +13,7 @@ The Webhook Project facilitates workflow integration of Github Webhook requests.
 ###End-point Installer Script
 The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. 
 
-The simplest way to use the end-point installer is to copy this project somewhere and run Composer:
+The simplest way to prepare the end-point installer is to copy this project somewhere and run Composer:
 ```
 git clone https://github.com/katmore/webhook.git 
 cd webhook
