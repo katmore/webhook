@@ -8,27 +8,32 @@ The Webhook Project facilitates the usage of Github Webhook requests into a work
 
 ##Requirements
  * PHP 7.0 or higher
- * PSR-4 Class autoloading; for example, using Composer:
- 
+
+##Usage
+###Endpoint Installer Script
+The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. 
+
+First, initialize a stand alone project; for example, by using Composer:
+```
+composer create-project katmore/webhook webhook
+```
+The installer can be invoked without any arguments; it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
+
+```bash
+php webhook/bin/add-endpoint.php
+```
+The `--help` switch will provide details on more advanced usage (such as quiet and non-interactive modes).
+```bash
+php webhook/bin/add-endpoint.php --help
+```
+
+###Wrapper Classes
+To use this project as a wrapper for within an existing project, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. As a recomended first step, add a dependancy using Composer to your existing project:
   ```bash
 composer require katmore/webhook
   ```
 
-##Usage
-###Endpoint Installer Script
-The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. The installer can be invoked without any arguments; it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
-```bash
-php bin/add-endpoint.php
-```
-The `--help` switch will provide details on more advanced usage (such as quiet and non-interactive modes).
-```bash
-php bin/add-endpoint.php --help
-```
-
-###Wrapper Classes
-To use this project as a wrapper, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. The **Webhook\Request** class facilitates interpreting the message body and related HTTP headers of a Github Webhook request. 
-
-The **Webhook\Request** class constructor will instantiate and populate a [**Webhook\Payload**](src/Payload.php) child class having a class name that corresponds to the Webhook "Event Type": it searches for the existence of a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the [GitHub Event Type](https://developer.github.com/v3/activity/events/types) within the namespace [**Webhook\Payload**](src/Payload). If a thusly named **Webhook\Payload** child class is not defined for a particular event; the [Webhook\Payload\Event](src/Payload/Event.php) class is used by default. For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is created and populated for a [**PushEvent** Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent). 
+The **Webhook\Request** class facilitates interpreting the message body and related HTTP headers of a Github Webhook request. The **Webhook\Request** class constructor will instantiate and populate a [**Webhook\Payload**](src/Payload.php) child class having a class name that corresponds to the Webhook "Event Type": it searches for the existence of a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the [GitHub Event Type](https://developer.github.com/v3/activity/events/types) within the namespace [**Webhook\Payload**](src/Payload). If a thusly named **Webhook\Payload** child class is not defined for a particular event; the [Webhook\Payload\Event](src/Payload/Event.php) class is used by default. For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is created and populated for a [**PushEvent** Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent). 
 
 The **Payload** object as populated by the **Webhook\Request** constructor is available using the **Webhook\Request::getPayload()** method as detailed in the example below:
 
