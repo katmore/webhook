@@ -1,22 +1,26 @@
 #Webhook
-Wrappers to handle [Github Webhook requests](https://developer.github.com/webhooks/).
+Wrappers and webservice to handle [Github Webhook requests](https://developer.github.com/webhooks/).
 
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
 ##Description
-The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It provides [class wrappers](#wrapper-classes) for integration and an [end-point installer script](#endpoint-installer-script) for a self-contained solution.
+The Webhook Project facilitates workflow integration of Github Webhook requests. It provides [class wrappers](#wrapper-classes) for existing projects and an optional [end-point installer script](#end-point-installer-script) for a self-contained solution that is easy to deploy.
 
 ##Requirements
  * PHP 7.0 or higher
- * PSR-4 Class autoloading; for example, using Composer:
- 
-  ```bash
-composer require katmore/webhook
-  ```
 
 ##Usage
-###Endpoint Installer Script
-The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository. When invoked without any arguments it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
+###End-point Installer Script
+The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. 
+
+The simplest way to prepare the end-point installer is to copy this project somewhere and run Composer:
+```
+git clone https://github.com/katmore/webhook.git 
+cd webhook
+composer update
+```
+The installer can be invoked without any arguments; it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
+
 ```bash
 php bin/add-endpoint.php
 ```
@@ -26,7 +30,14 @@ php bin/add-endpoint.php --help
 ```
 
 ###Wrapper Classes
-To use this project as a wrapper, the main topics of focus will be the **"Webhook\Request"** class and **"Payload"** objects. The **Webhook\Request** class facilitates dealing with a Github Webhook request by interpreting the message body and related HTTP headers. The **Webhook\Request** class constructor will instantiate and populate a **Webhook\Payload** child class having a class name that corresponds to the Webhook "Event Type": it searches for the existence of a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the [GitHub Event Type](https://developer.github.com/v3/activity/events/types) within the namespace [**Webhook\Payload**](src/Payload). For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is created and populated for a [**PushEvent** Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent). If no **Webhook\Payload** child class is defined for a particular event; the [Webhook\Payload\Event](src/Payload/Event.php) class is used by default. If successful, the **Payload** object is available  via the **Webhook\Request::getPayload()** method as detailed in the example below:
+To use this project's wrapper classes within your existing project, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. As a recomended first step, add a dependancy using Composer to your existing project:
+  ```bash
+composer require katmore/webhook
+  ```
+
+The **Webhook\Request** class facilitates interpreting the message body and related HTTP headers of a Github Webhook request. The **Webhook\Request** class constructor will instantiate and populate a [**Webhook\Payload**](src/Payload.php) child class having a class name that corresponds to the Webhook "Event Type": it searches for the existence of a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the [GitHub Event Type](https://developer.github.com/v3/activity/events/types) within the namespace [**Webhook\Payload**](src/Payload). If a thusly named **Webhook\Payload** child class is not defined for a particular event; the [Webhook\Payload\Event](src/Payload/Event.php) class is used by default. For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is created and populated for a [**PushEvent** Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent). 
+
+The **Payload** object as populated by the **Webhook\Request** constructor is available using the **Webhook\Request::getPayload()** method as detailed in the example below:
 
 ```php
 /*
