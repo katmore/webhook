@@ -4,8 +4,7 @@ Create webservice end-points for Github webhooks.
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
 ##Description
-The Webhook Project facilitates convenient creation of RESTful end-points to respond to event callbacks from Github webhooks.
-For example, the [`Callback` class](src/Callback.php) validates that the webhook callback provided the same "Secret" you expected from when you initially set up a repository webhook.
+The Webhook Project facilitates handling of from Github webhooks. It may be used as a [wrapper that can be integrated to other projects](#webhookrequest-and-webhookpayload-classes); or, as a solution to provide full webservice end-points (see the [end-point installer script](#endpoint-installer-script) or the [end-point example](#using-the-provided-end-point-example)).
 
 ##Usage
 ###Class autoloader
