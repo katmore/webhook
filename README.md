@@ -105,7 +105,7 @@ cp web/endpoint-example.php web/my-org/my-repo.php
      * change the value of `$config['RepoUrl']` to your GitHub repository URL:
      
      ```php
-$config['RepoUrl'] = 'https://github.com/my-organization/my-repo.php';
+$config['RepoUrl'] = 'https://github.com/my-organization/my-repo';
    ```
      * change the value of `$config['Secret']` to the "Secret" configured in Github for the webhook:
      
