@@ -4,27 +4,29 @@ Wrappers to handle [Github Webhook requests](https://developer.github.com/webhoo
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
 ##Description
-The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It provides [class wrappers](#wrapper-classes) for integration and an optional [end-point installer script](#endpoint-installer-script) for a self-contained solution that should be easy to deploy.
+The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It provides [class wrappers](#wrapper-classes) for integration and an optional [end-point installer script](#end-point-installer-script) for a self-contained solution that should be easy to deploy.
 
 ##Requirements
  * PHP 7.0 or higher
 
 ##Usage
-###Endpoint Installer Script
+###End-point Installer Script
 The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. 
 
-First, initialize a stand alone project; for example, by using Composer:
+The simplest way to use the end-point installer would be copy this project somewhere and run Composer:
 ```
-composer create-project katmore/webhook webhook
+git clone https://github.com/katmore/webhook.git 
+cd webhook
+composer update
 ```
 The installer can be invoked without any arguments; it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
 
 ```bash
-php webhook/bin/add-endpoint.php
+php bin/add-endpoint.php
 ```
 The `--help` switch will provide details on more advanced usage (such as quiet and non-interactive modes).
 ```bash
-php webhook/bin/add-endpoint.php --help
+php bin/add-endpoint.php --help
 ```
 
 ###Wrapper Classes
