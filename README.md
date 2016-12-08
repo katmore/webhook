@@ -25,7 +25,7 @@ php bin/add-endpoint.php --help
 ```
 
 ###Webhook/Request and Webhook/Payload classes
-The [end-point example](bin/add-endpoint.php) and [installer script](web/endpoint-example.php) scripts are provided for convenience only, and are not required.
+The [end-point example](web/endpoint-example.php) and [installer script](bin/add-endpoint.php) scripts are provided for convenience only, and are not required.
 Customized integration into any project is facilitated by using the Webhook/Request class to populate a Webhook/Payload object:
 
 ```php
