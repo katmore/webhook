@@ -30,7 +30,7 @@ php bin/add-endpoint.php --help
 ```
 
 ###Wrapper Classes
-To use this project as a wrapper for within an existing project, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. As a recomended first step, add a dependancy using Composer to your existing project:
+To use this project's wrapper classes within your existing project, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. As a recomended first step, add a dependancy using Composer to your existing project:
   ```bash
 composer require katmore/webhook
   ```
