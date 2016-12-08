@@ -4,7 +4,7 @@ Wrappers to handle [Github Webhook requests](https://developer.github.com/webhoo
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
 ##Description
-The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It provides [class wrappers](#webhookrequest-and-webhookpayload-classes) for integration and an [end-point installer script](#endpoint-installer-script) for a self-contained solution.
+The Webhook Project facilitates the usage of Github Webhook requests into a workflow. It provides [class wrappers](#wrapper-classes) for integration and an [end-point installer script](#endpoint-installer-script) for a self-contained solution.
 
 ##Requirements
  * PHP 7.0 or higher
@@ -30,17 +30,17 @@ To use this project as a wrapper, the main topics of focus will be the **"Webhoo
 
 ```php
 /*
- * prepare the messageBody; for example, by reading from the php input stream
+ * obtain the messageBody; in this case, by reading from the php input stream
  */
 $messageBody = file_get_contents('php://input');
 
 /*
- * prepare the 'hubSignature'; for example, from the value of the HTTP header 'HTTP_X_HUB_SIGNATURE'
+ * obtain the 'hubSignature'; for example, from the value of the HTTP header 'HTTP_X_HUB_SIGNATURE'
  */
 $hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
 
 /*
- * prepare the 'gitHubEvent'; for example, from the value of the HTTP header 'HTTP_X_GITHUB_EVENT'
+ * obtain the 'gitHubEvent'; for example, from the value of the HTTP header 'HTTP_X_GITHUB_EVENT'
  */
 $gitHubEvent = $_SERVER['HTTP_X_GITHUB_EVENT'];
 
