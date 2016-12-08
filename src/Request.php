@@ -6,7 +6,7 @@ use Webhook\Payload;
 class Request {
    
    /**
-    * Loads a webhook request object from specified paramaters.
+    * Provides a webhook request object from specified paramaters.
     *    Suitable for use in conjunction with the $_SERVER array.
     *
     * @param string $messageBody request message body
@@ -21,7 +21,7 @@ class Request {
     *
     * @return \Webhook\Request
     */
-   public static function load(string $messageBody,array $param=null) {
+   public static function service(string $messageBody,array $param=null) {
       $request = [
          'HTTP_X_HUB_SIGNATURE'=>'',
          'HTTP_X_GITHUB_EVENT'=>'',

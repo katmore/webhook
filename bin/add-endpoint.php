@@ -163,7 +163,7 @@ EOT;
  */
 $config['RepoUrl'] = '%escaped-repo-url%';
 $config['Secret'] = base64_decode('%base64-hub-secret%');
-$config['RepoPath'] = '%base64-repo-path%';
+$config['RepoPath'] = base64_decode('%base64-repo-path%');
 $config['RepoType'] = '%repo-type%';
                
 use Webhook\Callback;
@@ -280,7 +280,7 @@ register_shutdown_function(function() {
 });
 
 try {
-   $request = Request::load(
+   $request = Request::service(
          file_get_contents('php://input'),
          isset($_SERVER)?$_SERVER:[]
          );

@@ -87,7 +87,7 @@ register_shutdown_function(function() {
 });
 
 try {
-   $request = Request::load(
+   $request = Request::service(
          file_get_contents('php://input'),
          isset($_SERVER)?$_SERVER:[]
          );
