@@ -72,7 +72,7 @@ $payload = $request->getPayload();
 var_dump($payload);
 ```
 ###Validating a request's "Hub Signature"
-At some point in the handling of a Webhook request it is critical that the "Hub Signature" be validated against the shared "Secret" for obvious security reasons. The [end-point installer](#endpoint-installer-script) and [end-point example](#endpoint-installer-script) both accomplish this by using the **Callback::validateRequest()** method of the [**Webhook\Callback** class](src/Callback.php). However, there may be situations where it is more practical to implement validation natively with the [`hash_hmac()` function](http://php.net/manual/en/function.hash-hmac.php) as detailed in the example below:
+At some point in the handling of a Webhook request it is critical that the "Hub Signature" be validated against the shared "Secret" for obvious security reasons. The [end-point installer](#endpoint-installer-script) and [end-point example](#endpoint-installer-script) both accomplish this by using the **Callback::validateRequest()** method of the [**Webhook\Callback** class](src/Callback.php). However, there may be situations where it is more practical to implement validation natively with the [`hash_hmac()` function](http://php.net/manual/en/function.hash-hmac.php) as shown in the example below:
 
 ```php
 /*
