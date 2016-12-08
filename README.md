@@ -25,7 +25,7 @@ The `--help` switch will provide details on more advanced usage (such as quiet a
 php bin/add-endpoint.php --help
 ```
 
-###Webhook\Request and Webhook\Payload classes
+###Wrapper Classes
 To use this project as a wrapper, the main topics of focus will be the **"Webhook\Request"** class and **"Payload"** objects. The **Webhook\Request** class facilitates dealing with a Github Webhook request by interpreting the message body and related HTTP headers. The **Webhook\Request** class constructor will instantiate and populate a **Webhook\Payload** child class having a class name that corresponds to the Webhook "Event Type": it searches for the existence of a class having the same ["short name"](http://php.net/manual/en/reflectionclass.getshortname.php) as the [GitHub Event Type](https://developer.github.com/v3/activity/events/types) within the namespace [**Webhook\Payload**](src/Payload). For example, a [Webhook\Payload\PushEvent object](src/Payload/PushEvent.php) is created and populated for a [**PushEvent** Webhook request](https://developer.github.com/v3/activity/events/types/#pushevent). If no **Webhook\Payload** child class is defined for a particular event; the [Webhook\Payload\Event](src/Payload/Event.php) class is used by default. If successful, the **Payload** object is available  via the **Webhook\Request::getPayload()** method as detailed in the example below:
 
 ```php
