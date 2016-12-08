@@ -72,7 +72,7 @@ $payload = $request->getPayload();
 var_dump($payload);
 ```
 ###Validating a request's "Hub Signature"
-It is highly recomended that you validate the "Hub Signature" against the shared 'Secret' configured for the Webhook.
+When doing customized integration, it is highly important to note that the "Hub Signature" should be validated against the shared 'Secret' configured for the Webhook.
 The following is an example of doing this validation with the native php `hash_hmac()` function.
 ```php
 /*
