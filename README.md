@@ -8,7 +8,7 @@ The Webhook Project facilitates handling of from Github webhooks. It may be used
 
 ##Usage
 ###Class autoloader
-Class autoloading is required for any usage. This can be done with Composer.
+Class autoloading is required for any usage and can be done with Composer.
   ```bash
 composer require katmore/webhook
   ```
