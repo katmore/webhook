@@ -1,16 +1,17 @@
-#Webhook
+# Webhook
+
 Wrappers and webservice to handle [Github Webhook requests](https://developer.github.com/webhooks/).
 
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
-##Description
+## Description
 The Webhook Project facilitates workflow integration of Github Webhook requests. It provides [class wrappers](#wrapper-classes) for existing projects and an optional [end-point installer script](#end-point-installer-script) for a self-contained solution that is easy to deploy.
 
-##Requirements
+## Requirements
  * PHP 7.0 or higher
 
-##Usage
-###End-point Installer Script
+## Usage
+### End-point Installer Script
 The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. 
 
 The simplest way to prepare the end-point installer is to copy this project somewhere and run Composer:
@@ -29,7 +30,7 @@ The `--help` switch will provide details on more advanced usage (such as quiet a
 php bin/add-endpoint.php --help
 ```
 
-###Wrapper Classes
+### Wrapper Classes
 To use this project's wrapper classes within your existing project, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. As a recomended first step, add a dependancy using Composer to your existing project:
   ```bash
 composer require katmore/webhook
@@ -82,7 +83,7 @@ $payload = $request->getPayload();
  */
 var_dump($payload);
 ```
-###Validating a request's "Hub Signature"
+### Validating a request's "Hub Signature"
 At some point in the handling of a Webhook request it is critical that the "Hub Signature" be validated against the shared "Secret" for obvious security reasons. The [end-point installer](#endpoint-installer-script) and [end-point example](#endpoint-installer-script) both accomplish this by using the **Callback::validateRequest()** method of the [**Webhook\Callback** class](src/Callback.php). However, there may be situations where it is more practical to implement validation natively with the [`hash_hmac()` function](http://php.net/manual/en/function.hash-hmac.php) as shown in the example below:
 
 ```php
@@ -115,38 +116,38 @@ if ($hash !== hash_hmac($algo, $messageBody, $hubSecret)) {
  */
 ```
 
-###Using the provided end-point example
+### Using the provided end-point example
 
 An end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php) which responds to a **PushEvent** by invoking 'pull' or 'update' commands on a local git or svn repository as appropriate. It also responds to a a **PingEvent** with a success message.
 
    * copy the provided [web/endpoint-example.php](web/endpoint-example.php)...
    
    ```bash
-cp web/endpoint-example.php web/my-org/my-repo.php
-    ```
+   cp web/endpoint-example.php web/my-org/my-repo.php
+   ```
    * edit "web/my-org/my-repo.php" to specify configuration...
      * change the value of `$config['RepoUrl']` to your GitHub repository URL:
      
      ```php
-$config['RepoUrl'] = 'https://github.com/my-organization/my-repo';
-   ```
+     $config['RepoUrl'] = 'https://github.com/my-organization/my-repo';
+     ```
      * change the value of `$config['Secret']` to the "Secret" configured in Github for the webhook:
      
      ```php
-$config['Secret'] = 'My Secret';
-   ```
+     $config['Secret'] = 'My Secret';
+     ```
      * change the value of `$config['RepoPath']` the local system path to the repository:
      
      ```php
-$config['RepoPath'] = '/path/to/my/repo';
-   ```
+     $config['RepoPath'] = '/path/to/my/repo';
+     ```
      * change the value of `$config['RepoType']` to either 'git' or 'svn', depending on the local repository type:
      
      ```php
-$config['RepoType'] = 'git';
-   ```
+     $config['RepoType'] = 'git';
+     ```
 
-##Legal
+## Legal
 "Webhook" is distributed under the terms of the [MIT license](LICENSE) or the [GPLv3](GPLv3) license.
 
 Copyright (c) 2016, Doug Bird.
