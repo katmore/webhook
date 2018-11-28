@@ -42,6 +42,11 @@ The **Payload** object as populated by the **Webhook\Request** constructor is av
 
 ```php
 /*
+ * the 'Secret' field corresponding to the expected Webhook request
+ */
+$hubSecret = "My Secret";
+
+/*
  * obtain the messageBody; in this case, by reading from the php input stream
  */
 $messageBody = file_get_contents('php://input');
@@ -60,6 +65,11 @@ $gitHubEvent = $_SERVER['HTTP_X_GITHUB_EVENT'];
  * instiantate a Webhook\Request object...
  */
 $request = new \Webhook\Request($messageBody, $hubSignature, $gitHubEvent);
+
+/*
+ * validate the request signature
+ */
+$request->validateSignature($hubSecret);
 
 /*
  * get the payload object...
@@ -108,7 +118,7 @@ try {
   /*
    * validate the request signature
    */
-  $request->validateSignature($hubSignature);
+  $request->validateSignature($hubSecret);
 } catch(\Webhook\InvalidRequest $e) {
    /*
     * force a 500 HTTP response code upon encountering an 'InvalidRequest' exception,
