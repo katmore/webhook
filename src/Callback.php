@@ -62,8 +62,10 @@ class Callback {
                $found_urlRule_match = true;
                break 1;
             }
+            
          }
-         if (!$found_urlRule_match) throw new InvalidRequest("failed to find a match for the payload's repository URL");
+         unset($url);
+         if (!$found_urlRule_match) throw new InvalidRequest("failed to find a match for the payload's repository URL; expected one of '".implode(", ",$this->_urlRule)."', got instead {$payload->repository->url}");
       }
       
       if (count($this->_eventRule)) {
