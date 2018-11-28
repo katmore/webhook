@@ -6,9 +6,9 @@
 
 /*
  * string $config['RepoUrl']
- *    GitHub repository URL: i.e: https://github.com/my-org/my-repo
+ *    GitHub repository URL: i.e: https://api.github.example.com/repos/my-org/my-repo
  */
-$config['RepoUrl'] = 'https://example.com/my-org/my-repo';
+$config['RepoUrl'] = 'https://api.github.example.com/repos/my-org/my-repo';
 
 /*
  * string $config['Secret']
