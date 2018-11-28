@@ -128,7 +128,7 @@ try {
 }
 ```
 
-Alternatively, there may be situations where it is desired to implement this validation natively by using the hash_hmac() function as shown in the example below:
+Alternatively, there may be situations where it is desired to implement this validation natively by using the `hash_hmac()` function as shown in the example below:
 ```php
 /*
  * the 'Secret' field corresponding to the expected Webhook request
