@@ -1,281 +1,336 @@
 #!/usr/bin/env php
 <?php
-return(function() {
-   if (0!==($exitStatus=($installer = new class() {
+
+$installer = new class() {
+   
+   const ME = 'add-endpoint.php';
+   
+   const ME_LABEL = 'Webhook End-Point Service Installer';
+   
+   const ME_URL = 'https://github.com/katmore/webhook#end-point-installer-script';
+    
+   const COPYRIGHT = '(c) 2016-2018 Doug Bird. All Rights Reserved.';
+   
+   const ME_ABOUT = "Creates a webhook endpoint that updates a local git (or SVN) repository.";
       
-      const ME = 'add-endpoint.php';
+   const FALLBACK_REPO_TYPE = 'git';
+   
+   const VALID_REPO_TYPES = ['git','svn'];
+   
+   /**
+    * @var int
+    */
+   private $exitStatus=0;
+   
+   /**
+    * @var bool
+    */
+   private $quiet;
+   
+   /**
+    * @var bool
+    */
+   private $verbose;
+   
+   /**
+    * @var bool
+    */
+   private $nonInteractive;
+   
+   /**
+    * @return int Exit status
+    */
+   public function getExitStatus() :int {
+      return $this->exitStatus;
+   }
+   
+   /**
+    * @return void
+    * @static
+    */
+   public static function printUsage() {
+      echo "Usage:\n";
+      //'[--help|--quiet|--verbose] ';
+      echo "   ".self::ME." [--help] | [<...Options>]\n";
+      echo "   ".self::ME." [-quiet|--verbose] [<...More Options>]\n";
+      echo "   ".self::ME." [[--non-interactive] --repo-url=<Repo URL> --hub-secret=<Github Webhook Secret>] [<...More Options>]\n";
+      echo "   ".self::ME." [--repo-path=<path to local repository> [--bad-repo-path-ok] [--repo-type=(svn|git)=git]] [<...More Options>]\n";
+      echo "   ".self::ME." [--overwrite-ok] [--endpoint-script=<endpoint script name>] [<...More Options>]\n";
+      echo "   ".self::ME." [--no-autoload-ok] [<...More Options>]\n";
       
-      const ME_LABEL = 'Webhook End-Point Service Installer';
-      
-      const ME_URL = 'https://github.com/katmore/webhook#end-point-installer-script';
-       
-      const COPYRIGHT = '(c) 2016 Doug Bird. All Rights Reserved.';
-      
-      const HELP_LABEL = "Webhook Project: https://github.com/katmore/webhook";
-       
-      const USAGE = '[--help [--quiet | --verbose] [--non-interactive] [--repo-url=<Repo URL> [--repo-path=<path to local repository> [--repo-type=<"svn"|"git">] [--hub-secret=<Github Webhook Secret>]]] [--autoload-path=<path to vendor/autoload.php> [--web-endpoint-dir=<path to web/endpoint directory>] [--endpoint-script=<endpoint script name>]]]';
-      
-      const FALLBACK_REPO_TYPE = 'git';
-      
-      const VALID_REPO_TYPES = ['git','svn'];
-      
-      private static function _getFallbackAutoload() :string{
-         return __DIR__ . "/../vendor/autoload.php";
-      }
-      
-      private static function _getFallbackWebEndpointDir() :string {
-         return __DIR__ . "/../web/endpoint";
-      }
-      
-      /**
-       * @return void
-       * @static
-       */
-      public static function showUsage() {
-         echo "Usage: ".PHP_EOL;
-         echo "   ".SELF::ME." ".self::USAGE.\PHP_EOL;
-      }
-      
-      public static function showHelp() {
-         echo self::HELP_LABEL.PHP_EOL;
-         $fallbackRepoType = self::FALLBACK_REPO_TYPE;
-         $validRepoTypes = implode(", ",self::VALID_REPO_TYPES);
-         if ($fallbackAutoload = realpath(self::_getFallbackAutoload())) {
-            $autoloadHelp = <<<"EOT"
---autoload-path (optional)
-   Path to class autoloader (ie: vendor/autoload.php)
-   default value: "$fallbackAutoload"
-EOT;
-         } else {
-            $autoloadHelp = <<<"EOT"
---autoload-path (required)
-   Path to class autoloader (ie: vendor/autoload.php)
-EOT;
-         }
-            
-         if ($fallbackWebEndpointDir = realpath(self::_getFallbackWebEndpointDir())) {
-            $webEndpointDirHelp = <<<"EOT"
---web-endpoint-dir (optional)
-   Path to web endpoint directory (ie: web/endpoint)
-   default value: "$fallbackWebEndpointDir"
-EOT;
-         } else {
-            $webEndpointDirHelp = <<<"EOT"
---web-endpoint-dir (required)
-   Path to web endpoint directory (ie: web/endpoint)
-EOT;
-         }
-            
-         echo <<<"EOT"
-Output Control:
---help
+   }
+   
+   public static function printHintError() {
+      self::printErrLine([
+         "Hint, try:",
+         "   ".self::ME." --usage",
+         "   ".self::ME." --help",
+      ]);
+   }
+   
+   public static function printHelp() {
+      echo self::ME_ABOUT."\n".self::ME_URL."\n\n";
+      $fallbackRepoType = self::FALLBACK_REPO_TYPE;
+      $validRepoTypes = implode(", ",self::VALID_REPO_TYPES);
+         
+      echo <<<"EOT"
+Runtime Mode Options:
+
+  --help
    Outputs this message then exits.
    
---usage
+  --usage
    Outputs message regarding available switches and options then exits.
 
---quiet
+Output Control Options:
+
+  --quiet
    Enable "quiet mode": the only output will be errors to STDERR.
 
---verbose (ignored if --quiet switch is present)
+  --verbose (ignored if --quiet switch is present)
    Enable "verbose mode": outputs extra information (such as full system paths, etc.)
 
---non-interactive
+  --non-interactive
    Enable "non interactive mode": no input prompts will be issued
 
-Endpoint Configuration:
---repo-url (required in "non interactive mode")
+Endpoint Configuration Options:
+
+  --repo-url (required in "non interactive mode")
    Remote repository URL
 
---hub-secret (required in "non interactive mode")
+  --hub-secret (required in "non interactive mode")
    Shared Webhook Secret
 
---repo-type (optional)
-   Local repository type
-   must be one of the following values: $validRepoTypes
-   default value: $fallbackRepoType
+  --repo-path (optional)
+   Local apth to a repository to update, if any.
 
-$autoloadHelp
+  --repo-type (optional)
+   Local repository type of --repo-path, if any.
+   Must be one of the following values: $validRepoTypes
+   Default value: $fallbackRepoType
 
-$webEndpointDirHelp
+  --endpoint-script (optional)
+   Name of webservice endpoint script to create (ie: reponame.php)
+   Default value: {path of --repo-url}.php
 
---endpoint-script (optional)
-   Name of webservice endpoint script to create in web-endpoint-dir (ie: reponame.php)
-   default value: <repository "full_name">.php
+Path Configuration Options:
+
+  --no-autoload-ok
+   Bypass the check for the composer generated vendor/autoload.php file.
+
+  --bad-repo-path-ok
+   Skip the local path check for the --repo-path, if applicable.
+
+  --overwrite-ok
+   Always overwrite an endpoint file if it already exists.
+
 EOT;
-         echo PHP_EOL;
-      }
-       
-      /**
-       * @return void
-       * @static
-       */
-      private static function _showIntro() {
-         echo self::ME_LABEL."\n".self::COPYRIGHT.\PHP_EOL;
-      }
-       
-      /**
-       * @return void
-       * @param string[]
-       * @static
-       */
-      private static function _showErrLine(array $strLines) {
-         $stderr = fopen('php://stderr', 'w');
-         foreach ($strLines as $line) fwrite($stderr, "$line".\PHP_EOL);
-         fclose($stderr);
-      }
-      /**
-       * @return void
-       * @param string[]
-       * @static
-       */
-      private static function _showLine(array $strLines) {
-         foreach ($strLines as $line) echo "$line".\PHP_EOL;
-      }
-       
-      /**
-       * @var int
-       */
-      private $_exitStatus=0;
-       
-      /**
-       * @return int Exit status
-       */
-      public function getExitStatus() :int { return $this->_exitStatus; }
-       
-      /**
-       * @var bool
-       */
-      private $_quiet;
-       
-      /**
-       * @var bool
-       */
-      private $_verbose;
-       
-      /**
-       * @var bool
-       */
-      private $_nonInteractive;
       
-      private static function _getEndpointSrc(string $repoUrl,string $repoPath,string $repoType,string $hubSecret,string $autoloadPath) {
-         $src = <<<'EOT'
+      if (! is_file(__DIR__ . "/../vendor/autoload.php")) {
+         $dir = realpath(__DIR__.'/../');
+         self::printErrLine([
+            "",
+            "Warning: the class autoload file '$dir/vendor/autoload.php' file is missing, please run composer",
+            "Hint, try: 'cd $dir && composer update'",
+         ]);
+      }
+   }
+    
+   /**
+    * @return void
+    * @static
+    */
+   private static function printIntro() {
+      echo self::ME_LABEL."\n".self::COPYRIGHT."\n";
+   }
+    
+   /**
+    * @return void
+    * @param string[]
+    * @static
+    */
+   private static function printErrLine(array $strLines) {
+      $stderr = fopen('php://stderr', 'w');
+      foreach ($strLines as $line) fwrite($stderr, "$line"."\n");
+      fclose($stderr);
+   }
+   /**
+    * @return void
+    * @param string[]
+    * @static
+    */
+   private static function printLine(array $strLines) {
+      foreach ($strLines as $line) echo "$line"."\n";
+   }
+   
+   private static function getEndpointSrc(string $repo_url,string $hub_secret,string $repo_path=null,string $repo_type=null) {
+      $src = <<<'EOT'
 <?php
 /**
  * Webservice End-Point for responding to GitHub Webhook Events
  * 
- * Generated at %generated-time%
- *    by %ME_LABEL% (%ME_URL%)
+ * Boilerplate Generated at %generated-time%
+ *    by %ME%
+ *  
+ * @link %ME_URL%
  * 
  */
+
+EOT;
+      
+      if ($repo_path!==null && $repo_type!==null) {
+         
+      }
+      
+      $src .= <<<'EOT'
+
 $config['RepoUrl'] = '%escaped-repo-url%';
 $config['Secret'] = base64_decode('%base64-hub-secret%');
+
+EOT;
+      if ($repo_path!==null && $repo_type!==null) {
+         $src .= <<<'EOT'
+
 $config['RepoPath'] = base64_decode('%base64-repo-path%');
 $config['RepoType'] = '%repo-type%';
-               
-use Webhook\Callback;
-use Webhook\Request;
-use Webhook\InvalidRequest;
-use Webhook\Payload;
-use Webhook\UrlCallbackRule;
 
-require '%escaped-autoload-path%';
+EOT;
+      } else {
+         $src .= <<<'EOT'
+         
+function onPushEvent(\Webhook\Payload\PushEvent $payload) {
+   /*
+    *
+    * --- place code in this function --
+    * --- that should execute when a Github 'push' event occurs --
+    *
+    */
+}
+            
+EOT;
+      }
+         
+      $src .= <<<'EOT'
 
-$callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
-   
-   if ($payload instanceof Payload\PushEvent) {
-      
-      if ($config['RepoType']=='git') {
-         
-         $line = exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$ret);
-      
-      } else if ($config['RepoType']=='svn') {
-         
-         $line = exec('svn up '.$config['RepoPath'].' 2>&1',$out,$ret);
-      
-      }
-      
-      header('Content-Type:text/plain');
-      if ($ret!=0) http_response_code(500);
-      
-      echo implode("\n",$out)."\n";
-      unset($out);
-      
-   } elseif ($payload instanceof Payload\PingEvent) {
-      
-      if ($config['RepoType']=='git') {
-          
-         $line = exec('cd '.$config['RepoPath'].' && git status 2>&1',$out,$ret);
-      
-      } else if ($config['RepoType']=='svn') {
-          
-         $line = exec('svn info '.$config['RepoPath'].' 2>&1',$out,$ret);
-      
-      }
-      
-      header('Content-Type:text/plain');
-      if ($ret!=0) http_response_code(500);
-      
-      echo implode("\n",$out)."\n";
-      unset($out);
-      
-   } else {
-      
-      $payloadType = gettype($payload);
-      if ($payloadType==='object') {
-         $payloadType = get_class(payload);
-      }
-      $data = ['PayloadType'=>payloadType];
-      if ($payload instanceof Payload\Event) {
-         $payloadData = $payload->getPayloadData();
-         switch ($payload->getEvent()) {
-             case 'IssuesEvent':
-                $data['IssuesEvent-Action'] = $payloadData['action'];
-                $data['Issue-Url'] = $payloadData['issue']['url'];
-                $data['Issue-Title'] = $payloadData['issue']['title'];
-                $data['Summary'] = "The issue was {$payloadData['action']}";
-                if ($payloadData['action']=='assigned') {
-                   $data['Summary'] .=" to {$payloadData['assignee']['html_url']}";
-                } elseif ($payloadData['action']=='unassigned') {
-                   $data['Summary'] .=" from {$payloadData['assignee']['html_url']}";
-                }
-                $data['Summary'] .=".";
-                break;
-             case 'IssueCommentEvent':
-                $data['IssueCommentEvent-Action'] = $payloadData['action'];
-                $data['Issue-Url'] = $payloadData['issue']['url'];
-                $data['Issue-Title'] = $payloadData['issue']['title'];
-                $data['Summary'] = "A comment was {$payloadData['action']}";
-                $data['Summary'] .= " by {$payloadData['comment']['user']['html_url']}.";
-                $data['CommentBody'] = $payloadData['comment']['body'];
-                break;
-             /*----------------------------------------------
-              * Add more 'case' statements for other Event Types you wish to handle
-              * below.
-              *
-              * See: https://developer.github.com/v3/activity/events/types
-              *  for event types and Payloads
-              */
-             /*uncomment the following following and edit the case block with the Github event name to 'handle' a different event*/
-             //case 'SomeEvent':
-             //    $data['Github-Event'] = $payload->getEvent();
-             //    /*uncomment below and edit to perform a local system command*/
-             //    //exec('#do-something');
-             //    /*uncomment below and edit the $notifyTo to send an Email notification*/
-             //    //mail($notifyTo="someone@example.com",$payload->getEvent()." on ".$payloadData['repository']['html_url'],json_encode($data,\JSON_PRETTY_PRINT));
-             //
-             default:
-                $data['Payload'] = $payloadData;
-                $data['UnhandledEvent'] = $payload->getEvent();
-         }
-         
-         if (!headers_sent() && empty(error_get_last())) {
-            header('Content-Type:application/json');
-         }
-         echo json_encode($data);
-      }
+require __DIR__."/../vendor/autoload.php";
+
+header('Content-Type: text/plain');
+
+$callback = new \Webhook\Callback($config['Secret'],function(\Webhook\Payload $payload ) use (&$config) {
+
+EOT;
+   if ($repo_path!==null && $repo_type!==null) {
+      $src .= <<<'EOT'
+   /*
+    * on a "push" event, do a "git pull" on the local system copy of the repo
+    */
+
+EOT;
    }
-},new UrlCallbackRule($config['RepoUrl']));
+      $src .= <<<'EOT'
+   if ($payload instanceof \Webhook\Payload\PushEvent) {
+
+EOT;
+      if ($repo_path!==null && $repo_type!==null) {
+         $src .= <<<'EOT'
+
+      if ($config['RepoType']=='git') {
+         
+         exec('cd '.$config['RepoPath'].' && git pull 2>&1',$out,$exit_status);
+      
+      } else if ($config['RepoType']=='svn') {
+         
+         exec('svn up '.$config['RepoPath'].' 2>&1',$out,$exit_status);
+      
+      }
+      
+      if ($exit_status!=0) http_response_code(500);
+      
+      echo implode("\n",$output)."\n\n";
+
+EOT;
+      } else {
+         $src .= <<<'EOT'
+      
+      $ret = onPushEvent($payload);
+      if ($ret===false) {
+         http_response_code(500);
+      }
+
+EOT;
+      }
+      $src .= <<<'EOT'
+      
+      echo "event: ".$payload->getEvent()."\n";
+      echo "zen: ".$payload->zen."\n";
+      
+      echo "sender login: ".$payload->sender->login."\n";
+      echo "sender avatar_url: ".$payload->sender->avatar_url."\n";
+      
+      echo "pusher name: ".$payload->pusher->name."\n";
+      echo "pusher email: ".$payload->pusher->email."\n";
+      
+      return;
+      
+   }
+
+
+EOT;
+      
+   if ($repo_path!==null && $repo_type!==null) {
+      $src .= <<<'EOT'
+   /*
+    * on a "ping" event, do a "git pull" on the local system copy of the repo
+    */
+
+EOT;
+   }
+      
+      $src .= <<<'EOT'
+   if ($payload instanceof \Webhook\Payload\PingEvent) {
+      
+
+EOT;
+      
+      if ($repo_path!==null && $repo_type!==null) {
+         $src .= <<<'EOT'
+
+      if ($config['RepoType']=='git') {
+          
+         exec('cd '.$config['RepoPath'].' && git status 2>&1',$out,$exit_status);
+      
+      } else if ($config['RepoType']=='svn') {
+          
+         exec('svn info '.$config['RepoPath'].' 2>&1',$out,$exit_status);
+      
+      }
+      
+      if ($exit_status!=0) http_response_code(500);
+      
+      echo implode("\n",$output)."\n\n";
+      
+      if ($exit_status!=0) echo "exit status: $exit_status\n";
+      
+
+EOT;
+      }
+
+      $src .= <<<'EOT'
+
+      echo "event: ".$payload->getEvent()."\n";
+      echo "zen: ".$payload->zen;
+      
+      echo "sender login: ".$payload->sender->login."\n";
+      echo "sender avatar_url: ".$payload->sender->avatar_url."\n";
+      
+      return;
+      
+   }
+   
+   http_response_code (500);
+   echo "unrecognized event: ".$payload->getEvent();
+   
+},new \Webhook\UrlCallbackRule($config['RepoUrl']));
 
 register_shutdown_function(function() {
    $last_error = error_get_last();
@@ -287,225 +342,338 @@ register_shutdown_function(function() {
 });
 
 try {
-   $request = Request::service(
+   $request = \Webhook\Request::service(
          file_get_contents('php://input'),
          isset($_SERVER)?$_SERVER:[]
          );
    if ($request->getRequestMethod()!=='POST') {
-      throw new InvalidRequest("requestMethod must be POST");
+      throw new \Webhook\InvalidRequest("requestMethod must be POST");
    }
    $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
-} catch(InvalidRequest $e) {
+} catch(\Webhook\InvalidRequest $e) {
    http_response_code(500);
    echo "Invalid Request: ".$e->getMessage();
 }
-EOT;
-         /*
-$config['RepoUrl'] = '%escaped-repo-url%';
-$config['Secret'] = base64_decode('%base64-hub-secret%');
-$config['RepoPath'] = '%base64-repo-path%';
-$config['RepoType'] = '%repo-type%';
-          */
 
-         $src=str_replace("%generated-time%",date("c"),$src);
-         $src=str_replace("%ME_LABEL%",self::ME_LABEL,$src);
-         $src=str_replace("%ME_URL%",self::ME_URL,$src);
-         $src=str_replace("%repo-url%",$repoUrl,$src);
-         $src=str_replace("%escaped-repo-url%",str_replace(['\\','\''],['\\\\','\\\''],$repoUrl),$src);
-         $src=str_replace("%base64-repo-path%",base64_encode($repoPath),$src);
-         $src=str_replace("%repo-type%",$repoType,$src);
-         $src=str_replace("%base64-hub-secret%",base64_encode($hubSecret),$src);
-         $src=str_replace("%escaped-autoload-path%",str_replace(['\\','\''],['\\\\','\\\''],$autoloadPath),$src);
-         
-         return $src;
+EOT;
+
+      $src=str_replace("%generated-time%",date("c"),$src);
+      $src=str_replace("%ME_LABEL%",self::ME_LABEL,$src);
+      $src=str_replace("%ME%",self::ME,$src);
+      $src=str_replace("%ME_URL%",self::ME_URL,$src);
+      
+      $src=str_replace("%base64-hub-secret%",base64_encode($hub_secret),$src);
+      $src=str_replace("%escaped-repo-url%",str_replace(['\\','\''],['\\\\','\\\''],$repo_url),$src);
+      $src=str_replace("%repo-url%",$repo_url,$src);
+      
+      if ($repo_path!==null && $repo_type!==null) {
+         $src=str_replace("%base64-repo-path%",base64_encode($repo_path),$src);
+         $src=str_replace("%repo-type%",$repo_type,$src);
       }
       
-      public function __construct() {
+      return $src;
+   }
+   
+   public function __construct() {
 
-         if (isset(getopt("",["help",])['help'])) {
-            self::_showIntro();
-            self::showHelp();
-            return;
-         }
-         
-         if (isset(getopt("",["usage",])['usage'])) {
-            self::_showIntro();
-            self::showUsage();
-            return;
-         }
+      if (isset(getopt("",["help",])['help'])) {
+         self::printIntro();
+         self::printHelp();
+         return;
+      }
+      
+      if (isset(getopt("",["usage",])['usage'])) {
+         self::printIntro();
+         self::printUsage();
+         return;
+      }
 
-         $this->_verbose = false;
-         if (!($this->_quiet=isset(getopt("",["quiet",])['quiet']))) {
-            $this->_verbose=isset(getopt("",["verbose",])['verbose']);
-         }
+      $this->verbose = false;
+      if (!($this->quiet=isset(getopt("",["quiet",])['quiet']))) {
+         $this->verbose=isset(getopt("",["verbose",])['verbose']);
+      }
 
-         $this->_nonInteractive = isset(getopt("",["non-interactive",])['non-interactive']);
+      $this->nonInteractive = isset(getopt("",["non-interactive",])['non-interactive']);
 
-         $this->_quiet || self::_showIntro();
-         
-         //(string $repoUrl,string $repoPath,string $repoType,string $hubSecret,string $event,string $autoloadPath)
-         $endpointCfg = [
-            'repo-url'=>'',
-            'repo-path'=>'',
-            'repo-type'=>self::FALLBACK_REPO_TYPE,
-            'hub-secret'=>'',
-            'autoload-path'=>(string) realpath(self::_getFallbackAutoload()),
-            'web-endpoint-dir'=>(string) realpath(self::_getFallbackWebEndpointDir()),
-            'endpoint-script'=>'',
-         ];
-         
-         foreach($endpointCfg as $k=>&$v) {
-            if (!empty(getopt("",["$k::",])[$k])) $v=getopt("",["$k::",])[$k];
+      $this->quiet || self::printIntro();
+      
+      if (! is_file(__DIR__ . "/../vendor/autoload.php")) {
+         if (!isset(getopt("",['no-autoload-ok'])['no-autoload-ok'])) {
+            $dir = realpath(__DIR__.'/../');
+            self::printErrLine([
+               "Error: the class autoload file '$dir/vendor/autoload.php' file is missing, please run composer",
+               "   (Hint, try: 'cd $dir && composer update')",
+               "Use the '--no-autoload-ok' flag to bypass this autoload file check."
+            ]);
+            return $this->exitStatus = 1;
          }
-         unset($k);
-         unset($v);
-         unset($opt);
-         
-         $required = ['repo-url','repo-path','repo-type','hub-secret','autoload-path','web-endpoint-dir'];
-         
-         if (!$this->_nonInteractive) {
-            $missing = [];
-            foreach($required as $k) {
-               if (empty($endpointCfg[$k])) {
-                  $missing[]=$k;
-               }
-            }
-            unset($k);
-            if (count($missing)) {
-               echo PHP_EOL."Interactive mode: provide configuration details or Ctrl+C to exit...".PHP_EOL;
-               foreach($required as $k) {
-                  for($i=0;$i<5;$i++) {
-                     $default="";
-                     if (!empty($endpointCfg[$k])) $default = " ({$endpointCfg[$k]})";
-                     $v = readline("Enter the $k$default: ");
-                     if (!empty($v)) {
-                        $endpointCfg[$k]=$v;
-                        break 1;
-                     }
-                     if (!empty($endpointCfg[$k])) {
-                        break 1;
-                     }
-                  }
-                  if (empty($endpointCfg[$k])) {
-                     self::_showErrLine([self::ME. ": (ERROR) failed to get value for '$k' after $i tries"]);
-                     return $this->_exitStatus=1;
-                  }
-               }
-            }
-            unset($missing);
-            unset($default);
-            unset($k);
-            unset($v);
-            unset($i);
+      }
+      
+      //(string $repo_url,string $repo_path,string $repo_type,string $hub_secret,string $event)
+      $endpointCfg = [
+         'repo-url'=>'',
+         'repo-path'=>null,
+         'repo-type'=>null,
+         'hub-secret'=>'',
+         'endpoint-script'=>'',
+      ];
+      
+      $cfgSourceOption = [];
+      
+      foreach($endpointCfg as $k=>&$v) {
+         if (!empty(getopt("",["$k::",])[$k])) {
+            $v=getopt("",["$k::",])[$k];
+            $cfgSourceOption []=$k;
          }
+      }
+      unset($k);
+      unset($v);
+      
+      $required = ['repo-url','hub-secret'];
+      
+      if (!$this->nonInteractive) {
          $missing = [];
          foreach($required as $k) {
             if (empty($endpointCfg[$k])) {
                $missing[]=$k;
-               self::_showErrLine([self::ME . ": (ERROR) missing required value for ".$k]);
             }
          }
          unset($k);
+         
          if (count($missing)) {
-            return $this->_exitStatus = 1;
+            self::printLine([
+               "",
+               "Interactive mode: provide configuration details or Ctrl+C to abort...",
+            ]);
+            foreach($required as $k) {
+               if (in_array($k,$cfgSourceOption)) {
+                  continue;
+               }
+               $default="";
+               if (!empty($endpointCfg[$k])) $default = " ({$endpointCfg[$k]})";
+               for($i=0;$i<5;$i++) {
+                  $v = trim(readline("Enter the $k$default: "));
+                  if (!empty($v)) {
+                     $endpointCfg[$k]=$v;
+                     break 1;
+                  }
+                  if (!empty($endpointCfg[$k])) {
+                     break 1;
+                  }
+               }
+               unset($v);
+               unset($default);
+               if (empty($endpointCfg[$k])) {
+                  self::printErrLine([self::ME. ": (ERROR) failed to get value for '$k' after $i tries"]);
+                  return $this->exitStatus=1;
+               }
+               unset($i);
+            }
+            unset($k);
          }
          unset($missing);
          
-         $error = false;
-         if (!realpath($endpointCfg['autoload-path']) || !is_file($endpointCfg['autoload-path']) || !is_readable($endpointCfg['autoload-path'])) {
-            self::_showErrLine([self::ME . ": (ERROR) 'autoload-path' did not resolve to readable file: {$endpointCfg['autoload-path']}"]);
-            $error = true;
+         $v = trim(readline("Shall this endpoint update a local copy of a git or svn repository? [y/(n)]: "));
+         if (substr($v,0,1)==='y') {
+            for($i=0;$i<5;$i++) {
+               $v = trim(readline("Enter the local repository path: "));
+               if (!empty($v)) {
+                  $endpointCfg['repo-path']=$v;
+                  break 1;
+               }
+            }
+            if (empty($endpointCfg['repo-path'])) {
+               self::printErrLine([self::ME. ": (ERROR) failed to get value for 'repo-path' after $i tries"]);
+               return $this->exitStatus=1;
+            }
+            unset($i);
+            
+            $v = trim(readline("Enter the repository type [svn/(git)]: "));
+            if (!empty($v)) {
+               $endpointCfg['repo-type']=self::FALLBACK_REPO_TYPE;
+            }
          }
-         
-         if (!realpath($endpointCfg['web-endpoint-dir']) || !is_dir($endpointCfg['web-endpoint-dir']) || !is_writable($endpointCfg['web-endpoint-dir'])) {
-            self::_showErrLine([self::ME . ": (ERROR) 'web-endpoint-dir' did not resolve to a writeable directory: {$endpointCfg['web-endpoint-dir']}"]);
-            $error = true;
+      }
+      
+      $missing = [];
+      foreach($required as $k) {
+         if (empty($endpointCfg[$k])) {
+            $missing[]=$k;
+            self::printErrLine([self::ME . ": (ERROR) missing required value for ".$k]);
          }
+      }
+      unset($k);
+      
+      if (count($missing)) {
+         return $this->exitStatus = 2;
+      }
+      unset($missing);
+      
+      
+      
+      
+      
+      if ($endpointCfg['repo-path']!==null && (empty(realpath($endpointCfg['repo-path'])) || !is_dir($endpointCfg['repo-path']) || !is_writable($endpointCfg['repo-path']))) {
          
-         if (!realpath($endpointCfg['repo-path']) || !is_dir($endpointCfg['repo-path']) || !is_writable($endpointCfg['repo-path'])) {
-            self::_showErrLine([self::ME . ": (ERROR) 'repo-path' did not resolve to a writeable directory: {$endpointCfg['repo-path']}"]);
-            $error = true;
-         }
+         self::printErrLine([self::ME . ": (WARNING) 'repo-path' did not resolve to a writeable directory: {$endpointCfg['repo-path']}"]);
          
-         if (empty(parse_url($endpointCfg['repo-url'],\PHP_URL_SCHEME))) {
-            self::_showErrLine([self::ME . ": (ERROR) 'repo-url' is missing a URL-SCHEME and is thus an invalid remote repository URL: {$endpointCfg['repo-url']}"]);
-            $error = true;
-         } else
-         if (empty(parse_url($endpointCfg['repo-url'],\PHP_URL_HOST))) {
-            self::_showErrLine([self::ME . ": (ERROR) 'repo-url' is missing a URL-HOST and is thus an invalid remote repository URL: {$endpointCfg['repo-url']}"]);
-            $error = true;
-         } else
-         if (empty(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH))) {
-            self::_showErrLine([self::ME . ": (ERROR) 'repo-url' is missing a URL-PATH and is thus an invalid remote repository URL: {$endpointCfg['repo-url']}"]);
-            $error = true;
-         } else {
-            $path = explode("/",parse_url($endpointCfg['repo-url'],\PHP_URL_PATH));
-            if (count($path)<3) {
-               self::_showErrLine([self::ME . ": (ERROR) did not recognize a valid repository name in the 'repo-url' : {$endpointCfg['repo-url']}"]);
-               $error = true;
+         $skipRepoPathCheck = false;
+         if (isset(getopt("",["bad-repo-path-ok",])['bad-repo-path-ok'])) {
+            $skipRepoPathCheck = true;
+         } elseif (!$this->nonInteractive) {
+            $v = trim(readline("Abort because the 'repo-path' is invalid? (choose 'n' to continue anyway) [(y)/n]: "));
+            if (substr($v,0,1)==='n') {
+               $skipRepoPathCheck = true;
             }
          }
          
-         if (!in_array($endpointCfg['repo-type'],self::VALID_REPO_TYPES,true)) {
-            self::_showErrLine([self::ME . ": (ERROR) the 'repo-type' \"{$endpointCfg['repo-type']}\" is invalid, it must be one of the following: ".implode(", ",self::VALID_REPO_TYPES)]);
+         if (!$skipRepoPathCheck) {
+            self::printErrLine([self::ME . ": aborted due to invalid 'repo-path', use --bad-repo-path-ok to skip this check"]);
+            if (in_array('repo-path',$cfgSourceOption)) {
+               $this->exitStatus = 2;
+            } else {
+               $this->exitStatus = 1;
+            }
+            return;
+         }
+      }
+      
+      $error = false;
+      
+      if (empty(parse_url($endpointCfg['repo-url'],\PHP_URL_SCHEME))) {
+         self::printErrLine([self::ME . ": (ERROR) 'repo-url' is missing a URL-SCHEME and is thus an invalid remote repository URL: {$endpointCfg['repo-url']}"]);
+         $error = true;
+         if (in_array('repo-url',$cfgSourceOption)) $this->exitStatus = 2;
+      } else
+      if (empty(parse_url($endpointCfg['repo-url'],\PHP_URL_HOST))) {
+         self::printErrLine([self::ME . ": (ERROR) 'repo-url' is missing a URL-HOST and is thus an invalid remote repository URL: {$endpointCfg['repo-url']}"]);
+         $error = true;
+         if (in_array('repo-url',$cfgSourceOption)) $this->exitStatus = 2;
+      } else
+      if (empty(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH))) {
+         self::printErrLine([self::ME . ": (ERROR) 'repo-url' is missing a URL-PATH and is thus an invalid remote repository URL: {$endpointCfg['repo-url']}"]);
+         $error = true;
+         if (in_array('repo-url',$cfgSourceOption)) $this->exitStatus = 2;
+      } else {
+         $path = explode("/",parse_url($endpointCfg['repo-url'],\PHP_URL_PATH));
+         if (count($path)<3) {
+            self::printErrLine([self::ME . ": (ERROR) did not recognize a valid repository name in the 'repo-url' : {$endpointCfg['repo-url']}"]);
             $error = true;
+            if (in_array('repo-url',$cfgSourceOption)) $this->exitStatus = 2;
          }
+      }
+      
+      if ($endpointCfg['repo-type']!==null && (!in_array($endpointCfg['repo-type'],self::VALID_REPO_TYPES,true))) {
+         self::printErrLine([self::ME . ": (ERROR) the 'repo-type' \"{$endpointCfg['repo-type']}\" is invalid, it must be one of the following: ".implode(", ",self::VALID_REPO_TYPES)]);
+         $error = true;
+         if (in_array('repo-type',$cfgSourceOption)) $this->exitStatus = 2;
+      }
+      
+      if ($error) {
+         if ($this->exitStatus===0) {
+            self::printErrLine([self::ME . ": (FATAL) aborted because of invalid user input"]);
+            $this->exitStatus = 1;
+         } elseif ($this->exitStatus===2) {
+            self::printErrLine([self::ME . ": (FATAL) aborted because there is at least one invalid parameter"]);
+         }
+         return;
          
-         if ($error) return $this->_exitStatus = 1;
-         
-         if (!empty(getopt("",["endpoint-script::",])['endpoint-script'])) {
-            $webEndpointScript=getopt("",["endpoint-script::",])['endpoint-script'];
+      }
+      unset($error);
+      
+      if ($endpointCfg['repo-type']===null && $endpointCfg['repo-path']!==null) {
+         $endpointCfg['repo-type'] = static::FALLBACK_REPO_TYPE;
+      }
+      
+      if (!empty(getopt("",["endpoint-script::",])['endpoint-script'])) {
+         $webEndpointScript=getopt("",["endpoint-script::",])['endpoint-script'];
+      } else {
+         $webEndpointScript = pathinfo(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH),\PATHINFO_DIRNAME)."/".pathinfo(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH),\PATHINFO_BASENAME);
+      }
+      if (substr($webEndpointScript,0,4)!='.php') {
+         $webEndpointScript.='.php';
+      }
+      $webEndpointScript = trim(str_replace('/','-',$webEndpointScript),'-');
+      $webEndpointPath = __DIR__ . "/../web/$webEndpointScript";
+      
+      $scriptDir = pathinfo($webEndpointPath,\PATHINFO_DIRNAME);
+      if (!is_dir($scriptDir) || !is_writable($scriptDir)) {
+         self::printErrLine([self::ME . ": (FATAL) web endpoint directory is not accessible: $scriptDir"]);
+         if (in_array('endpoint-script',$cfgSourceOption)) {
+            $this->exitStatus = 2;
          } else {
-            $webEndpointScript = pathinfo(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH),\PATHINFO_DIRNAME)."/".pathinfo(parse_url($endpointCfg['repo-url'],\PHP_URL_PATH),\PATHINFO_BASENAME);
+            $this->exitStatus = 1;
          }
-         if (substr($webEndpointScript,0,4)!='.php') {
-            $webEndpointScript.='.php';
-         }
-         $webEndpointPath = "{$endpointCfg['web-endpoint-dir']}$webEndpointScript";
-         
-         $scriptDir = pathinfo($webEndpointPath,\PATHINFO_DIRNAME);
-         if (!is_dir($scriptDir)) {
-            if (!mkdir($scriptDir,0777,true)) {
-               self::_showErrLine(["could not create subdir for endpoint-script: $scriptDir"]);
+         return;
+      }
+      
+      $endpointShortname = pathinfo($scriptDir,\PATHINFO_FILENAME)."/".pathinfo($webEndpointScript,\PATHINFO_BASENAME);
+      
+      if (is_file($webEndpointPath)) {
+         $overwrite = false;
+         //self::printErrLine([self::ME . ": aborted due to invalid 'repo-path', use --bad-repo-path-ok to skip this check"]);
+         self::printErrLine([self::ME.": (WARNING) the endpoint file already exists: $endpointShortname"]);
+         if (isset(getopt("",["overwrite-ok",])['overwrite-ok'])) {
+            $overwrite = true;
+         } elseif (!$this->nonInteractive) {
+            $v = trim(readline("Ok to overwrite existing file? [y/(n)]: "));
+            if (substr($v,0,1)==='y') {
+               $overwrite = true;
             }
          }
          
-         $this->_verbose && self::_showLine(["endpoint path: $webEndpointPath"]);
-         
-         $this->_quiet || self::_showLine(["generating endpoint: web/endpoint/".pathinfo($scriptDir,\PATHINFO_FILENAME)."/".pathinfo($webEndpointScript,\PATHINFO_BASENAME)]);
-         
-         file_put_contents($webEndpointPath, self::_getEndpointSrc( $endpointCfg['repo-url'], $endpointCfg['repo-path'], $endpointCfg['repo-type'], $endpointCfg['hub-secret'], $endpointCfg['autoload-path']));
-         
-         $this->_quiet || self::_showLine(['(success)']);
+         if (!$overwrite) {
+            self::printErrLine([self::ME . ": aborted because endpoint file already exists, use --overwrite-ok to skip this check"]);
+            if (in_array('endpoint-script',$cfgSourceOption)) {
+               $this->exitStatus = 2;
+            } else {
+               $this->exitStatus = 1;
+            }
+            return;
+         }
       }
-       
-
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-
-   })->getExitStatus())) {
-      if (PHP_SAPI=='cli') {
-         $installer->showUsage();
-         exit($exitStatus);
+      
+      $this->verbose && self::printLine(["endpoint path: $webEndpointPath"]);
+      
+      $this->quiet || self::printLine(["generating endpoint: $endpointShortname"]);
+      
+      $endpointSrc = self::getEndpointSrc( $endpointCfg['repo-url'], $endpointCfg['hub-secret'], $endpointCfg['repo-path'], $endpointCfg['repo-type']);
+      
+      //(string $repo_url,string $hub_secret,string $repo_path=null,string $repo_type=null)
+      $errorMessage = [];
+      $errorReporting = error_reporting(error_reporting() | E_NOTICE);
+      $errorHandler = set_error_handler(function($errno, $errstr, $errfile, $errline) use (&$errorMessage)
+      {
+         $errorMessage []= $errstr;
+      });
+      $endpointResult = file_put_contents($webEndpointPath, $endpointSrc);
+      set_error_handler($errorHandler);
+      error_reporting($errorReporting);
+      
+      if (false===$endpointResult) {
+         foreach($errorMessage as $errstr) {
+            self::printErrLine([self::ME . ": file_put_contents() error: ".$errstr]);
+         }
+         unset($errstr);
+         
+         self::printErrLine([self::ME . ": (FATAL) failed to endpoint '$webEndpointPath'"]);
+         return $this->exitStatus = 1;
       }
-      return $exitStatus;
+      
+      $this->quiet || self::printLine(['(success)']);
    }
-})();
+    
 
+};
 
+if ($installer->getExitStatus()!==0) {
+   if ($installer->getExitStatus()===2) {
+      $installer->printHintError();
+   }
+   exit($installer->getExitStatus());
+}
+
+exit(0);
 
 
 

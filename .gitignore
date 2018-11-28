@@ -2,4 +2,5 @@
 !/.gitignore
 composer.lock
 /vendor/
-web/endpoint/
+/web/
+!/web/endpoint-example.php
