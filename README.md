@@ -8,31 +8,31 @@ Wrappers and webservice to handle [Github Webhook requests](https://developer.gi
 The Webhook Project facilitates workflow integration of Github Webhook requests. It provides [class wrappers](#wrapper-classes) for existing projects and an optional [end-point installer script](#end-point-installer-script) for a self-contained solution that is easy to deploy.
 
 ## Requirements
- * PHP 7.0 or higher
+ * PHP 7.2 or higher
 
 ## Usage
 ### End-point Installer Script
 The command-line script [bin/add-endpoint.php](bin/add-endpoint.php) creates a webservice end-point that responds to a Github Webhook for the **PushEvent** on a remote repository by updating a local repository and to a **PingEvent** by displaying a success message. 
 
 The simplest way to prepare the end-point installer is to copy this project somewhere and run Composer:
-```
+```sh
 git clone https://github.com/katmore/webhook.git 
 cd webhook
 composer update
 ```
 The installer can be invoked without any arguments; it will prompt for all the required parameters (such as the remote URL, local repo path, webhook secret, etc.):
 
-```bash
+```sh
 php bin/add-endpoint.php
 ```
 The `--help` switch will provide details on more advanced usage (such as quiet and non-interactive modes).
-```bash
+```sh
 php bin/add-endpoint.php --help
 ```
 
 ### Wrapper Classes
 To use this project's wrapper classes within your existing project, the main topics of focus will be the [**Webhook\Request** class](src/Request.php) and **Payload** objects. As a recomended first step, add a dependancy using Composer to your existing project:
-  ```bash
+  ```sh
 composer require katmore/webhook
   ```
 
@@ -122,10 +122,10 @@ An end-point example is provided at [web/endpoint-example.php](web/endpoint-exam
 
    * copy the provided [web/endpoint-example.php](web/endpoint-example.php)...
    
-   ```bash
-   cp web/endpoint-example.php web/my-org/my-repo.php
+   ```sh
+   cp web/endpoint-example.php web/my-repo-endpoint.php
    ```
-   * edit "web/my-org/my-repo.php" to specify configuration...
+   * edit to specify configuration...
      * change the value of `$config['RepoUrl']` to your GitHub repository URL:
      
      ```php
@@ -136,19 +136,32 @@ An end-point example is provided at [web/endpoint-example.php](web/endpoint-exam
      ```php
      $config['Secret'] = 'My Secret';
      ```
-     * change the value of `$config['RepoPath']` the local system path to the repository:
+     * leave the value of `$config['RepoPath']` empty to skip the repo update, or change it to the local system path to a repository to perform a `git update` on every 'push' Webhook event:
      
      ```php
-     $config['RepoPath'] = '/path/to/my/repo';
+     $config['RepoPath'] = '';
+     //$config['RepoPath'] = '/path/to/my/repo';
      ```
-     * change the value of `$config['RepoType']` to either 'git' or 'svn', depending on the local repository type:
+     
+     * place any custom code within the `onPushEvent` function that should be executed on every 'push' Webhook event
      
      ```php
-     $config['RepoType'] = 'git';
+     function onPushEvent(Payload\PushEvent $payload) {
+         /*
+          *
+          * --- place code in this function --
+          * --- that should execute when a Github 'push' event occurs --
+          *
+          */
+          //
+          // place your custom code here
+          //
+     }
      ```
+    
 
 ## Legal
 "Webhook" is distributed under the terms of the [MIT license](LICENSE) or the [GPLv3](GPLv3) license.
 
-Copyright (c) 2016, Doug Bird.
+Copyright (c) 2016-2018, Doug Bird.
 All rights reserved.
