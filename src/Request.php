@@ -1,46 +1,8 @@
 <?php
 namespace Webhook;
 
-use Webhook\Payload;
-
 class Request {
    
-   /**
-    * Provides a webhook request object from specified paramaters.
-    *    Suitable for use in conjunction with the $_SERVER array.
-    *
-    * @param string $messageBody request message body
-    * @param array $param assoc array of paramaters:<ul>
-    *    <li><b>string $param['HTTP_X_HUB_SIGNATURE']</b> HTTP_X_HUB_SIGNATURE.</li>
-    *    <li><b>string $param['HTTP_X_GITHUB_EVENT']</b> HTTP_X_GITHUB_EVENT.</li>
-    *    <li><b>string $param['CONTENT_TYPE']</b> CONTENT_TYPE. Optional.</li>
-    *    <li><b>string $param['HTTP_X_GITHUB_DELIVERY']</b> HTTP_X_GITHUB_DELIVERY.</li>
-    *    <li><b>string $param['REQUEST_METHOD']</b> REQUEST_METHOD.</li>
-    *    <li><b>string $param['HTTP_USER_AGENT']</b> HTTP_USER_AGENT.</li>
-    * </ul>
-    *
-    * @return \Webhook\Request
-    */
-   public static function service(string $messageBody,array $param=null) {
-      $request = [
-         'HTTP_X_HUB_SIGNATURE'=>'',
-         'HTTP_X_GITHUB_EVENT'=>'',
-         'CONTENT_TYPE'=>'',
-         'HTTP_X_GITHUB_DELIVERY'=>'',
-         'REQUEST_METHOD'=>'',
-         'HTTP_USER_AGENT'=>'',
-      ];
-      if (!empty($param)) {
-         foreach($request as $k=>&$v) {
-            if (isset($param[$k])) $v=$param[$k];
-         }
-      }
-      return new static(
-            $messageBody,$request['HTTP_X_HUB_SIGNATURE'],$request['HTTP_X_GITHUB_EVENT'],
-            $request['CONTENT_TYPE'],$request['HTTP_X_GITHUB_DELIVERY'],
-            $request['REQUEST_METHOD'],$request['HTTP_USER_AGENT']
-            );
-   }
    
    /**
     * @var string
@@ -87,6 +49,74 @@ class Request {
     * @var \Webhook\Payload
     */
    private $_payload;
+   
+   /**
+    * Provides a webhook request object from specified paramaters.
+    *    Suitable for use in conjunction with the $_SERVER array.
+    *
+    * @param string $messageBody request message body
+    * @param array $param assoc array of paramaters:<ul>
+    *    <li><b>string $param['HTTP_X_HUB_SIGNATURE']</b> HTTP_X_HUB_SIGNATURE.</li>
+    *    <li><b>string $param['HTTP_X_GITHUB_EVENT']</b> HTTP_X_GITHUB_EVENT.</li>
+    *    <li><b>string $param['CONTENT_TYPE']</b> CONTENT_TYPE. Optional.</li>
+    *    <li><b>string $param['HTTP_X_GITHUB_DELIVERY']</b> HTTP_X_GITHUB_DELIVERY.</li>
+    *    <li><b>string $param['REQUEST_METHOD']</b> REQUEST_METHOD.</li>
+    *    <li><b>string $param['HTTP_USER_AGENT']</b> HTTP_USER_AGENT.</li>
+    * </ul>
+    *
+    * @return \Webhook\Request
+    */
+   public static function service(string $messageBody,array $param=null) {
+      $request = [
+         'HTTP_X_HUB_SIGNATURE'=>'',
+         'HTTP_X_GITHUB_EVENT'=>'',
+         'CONTENT_TYPE'=>'',
+         'HTTP_X_GITHUB_DELIVERY'=>'',
+         'REQUEST_METHOD'=>'',
+         'HTTP_USER_AGENT'=>'',
+      ];
+      if (!empty($param)) {
+         foreach($request as $k=>&$v) {
+            if (isset($param[$k])) $v=$param[$k];
+         }
+      }
+      return new static(
+            $messageBody,$request['HTTP_X_HUB_SIGNATURE'],$request['HTTP_X_GITHUB_EVENT'],
+            $request['CONTENT_TYPE'],$request['HTTP_X_GITHUB_DELIVERY'],
+            $request['REQUEST_METHOD'],$request['HTTP_USER_AGENT']
+            );
+   }
+   
+   /**
+    * Determines if a secret matches a signature and message body.
+    *
+    * @param string $hub_secret Secret string known by the webhoook provider.
+    * @param string $hub_signature Hub-Signature value specified by the request.
+    * @param string $message_body Raw request payload.
+    *
+    * @return bool true if signature is valid, <b>bool</b> false otherwise
+    */
+   final public static function isValidSignature(string $hub_secret, string $hub_signature, string $message_body) : bool {
+      list($algo, $hash) = explode('=', $hub_signature, 2) + ['', ''];
+      if ($hash !== hash_hmac($algo, $message_body, $hub_secret)) {
+         return false;
+      }
+      return true;
+   }
+   
+   /**
+    * Enforces that a secret matches this request's signature and message body.
+    *
+    * @param string $hub_secret Secret string known by the webhoook provider.
+    *
+    * @return void
+    * @throws \Webhook\InvalidRequest
+    */
+   public function validateSignature(string $hub_secret) {
+      if (!self::isValidSignature($hub_secret, $this->_hubSignature, $this->_messageBody)) {
+         throw new InvalidRequest("secret validation failed");
+      }
+   }
    
    /**
     * @param string $messageBody

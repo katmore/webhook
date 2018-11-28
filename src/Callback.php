@@ -4,20 +4,36 @@ namespace Webhook;
 class Callback {
    
    /**
-    * Invokes the previously configured callback if the Hub-Signature corresponds to the payload and Hub-Secret. 
+    * Invokes the callback after enforcing that the Hub-Signature corresponds to the payload and Hub-Secret and 
+    * that the <b>Payload</b> meets all applicable <b>CallbackRule</b> configurations.
     * 
     * @param string $hubSignature Hub-Signature value specified by the request.
     * @param string $rawPayload raw request payload.
     * @param \Webhook\Payload $payload Payload object.
     * 
-    * @return boolean
+    * @return void
+    * @throws \Webhook\InvalidRequest
+    * @deprecated
+    * @see \Webhook\Callback::validatePayload()
     */
-   public function validateRequest(string $hubSignature,string $rawPayload, Payload $payload) {
-      list($algo, $hash) = explode('=', $hubSignature, 2) + ['', ''];
-      if ($hash !== hash_hmac($algo, $rawPayload, $this->_hubSecret)) {
-         return new InvalidRequest("secret validation failed");
+   public function validateRequest(string $hubSignature,string $rawPayload, Payload $payload)  {
+      if (!Request::isValidSignature($this->_hubSecret, $hubSignature, $rawPayload)) {
+         throw new InvalidRequest("secret validation failed");
       }
-      
+      return $this->validatePayload($payload);
+   }
+   
+   /**
+    * Invokes the callback after enforcing that the <b>Payload</b> meets all applicable <b>CallbackRule</b> configurations. 
+    * 
+    * @param string $hubSignature Hub-Signature value specified by the request.
+    * @param string $rawPayload raw request payload.
+    * @param \Webhook\Payload $payload Payload object.
+    * 
+    * @return void
+    * @throws \Webhook\InvalidRequest
+    */
+   public function validatePayload(Payload $payload)  {
       
       if (count($this->_urlRule)) {
          $found_urlRule_match=false;
