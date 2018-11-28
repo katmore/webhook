@@ -84,7 +84,7 @@ $payload = $request->getPayload();
 var_dump($payload);
 ```
 ### Validating a request's "Hub Signature"
-At some point in the handling of a Webhook request it is critical that the "Hub Signature" be validated against the shared "Secret" for obvious security reasons. The [end-point installer](#endpoint-installer-script) and [end-point example](#endpoint-installer-script) both accomplish this by using the **Callback::validateRequest()** method of the [**Webhook\Callback** class](src/Callback.php). 
+At some point in the handling of a Webhook request it is critical that the "Hub Signature" be validated against the shared "Secret" for obvious security reasons. The [end-point installer](#endpoint-installer-script) and [end-point example](#endpoint-installer-script) both accomplish this by using the `Request::validateSignature()` method of the [**Webhook\Request** class](src/Callback.php). 
 
 ```php
 /*
@@ -93,76 +93,35 @@ At some point in the handling of a Webhook request it is critical that the "Hub 
 $hubSecret = "My Secret";
 
 /*
- * obtain the messageBody; in this case, by reading from the php input stream
+ * obtain the messageBody, hubSignature, and gitHubEvent
  */
 $messageBody = file_get_contents('php://input');
-
-/*
- * obtain the 'hubSignature'; for example, from the value of the HTTP header 'HTTP_X_HUB_SIGNATURE'
- */
 $hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
-
-/*
- * obtain the 'gitHubEvent'; for example, from the value of the HTTP header 'HTTP_X_GITHUB_EVENT'
- */
 $gitHubEvent = $_SERVER['HTTP_X_GITHUB_EVENT'];
 
 /*
- * instiantate a Webhook\Request object...
+ * instiantate a 'Request' object...
  */
 $request = new \Webhook\Request($messageBody, $hubSignature, $gitHubEvent);
 
-/*
- * instantiate 'Callback' controller object
- */
-$callback = new \Webhook\Callback($hubSecret,function(\Webhook\Payload $payload) {
-   echo "event: ".$payload->getEvent()."\n";
-   if ($payload instanceof \Webhook\Payload\PushEvent) {
-     //
-     // place custom code here that should be executed upon every Webhook 'push' event
-     //
-   }
-});
-
 try {
   /*
-   * validate the request with the 'Callback' controller object
+   * validate the request signature
    */
-  $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
+  $request->validateSignature($hubSignature);
 } catch(\Webhook\InvalidRequest $e) {
    /*
     * force a 500 HTTP response code upon encountering an 'InvalidRequest' exception,
     */
    http_response_code(500);
    echo "Invalid Request: ".$e->getMessage();
-}
-```
-
-Alternatively, there may be situations where it is desired to implement this validation natively by using the `hash_hmac()` function as shown in the example below:
-```php
-/*
- * the 'Secret' field corresponding to the expected Webhook request
- */
-$hubSecret = "My Secret";
-
-/*
- * obtain the messageBody; in this case, by reading from the php input stream
- */
-$messageBody = file_get_contents('php://input');
-
-/*
- * obtain the signature via HTTP header
- */
-$hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
-
-/*
- * validate the signature
- */
-list($algo, $hash) = explode('=', $hubSignature, 2) + ['', ''];
-if ($hash !== hash_hmac($algo, $messageBody, $hubSecret)) {
-   echo "Invalid Signature!";
    return;
 }
+
+/*
+ * continue to do more things...
+ */
+//$payload = $request->getPayload();
 ```
 
 ### Using the provided end-point example
