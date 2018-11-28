@@ -93,9 +93,29 @@ At some point in the handling of a Webhook request it is critical that the "Hub 
 $hubSecret = "My Secret";
 
 /*
+ * obtain the messageBody; in this case, by reading from the php input stream
+ */
+$messageBody = file_get_contents('php://input');
+
+/*
+ * obtain the 'hubSignature'; for example, from the value of the HTTP header 'HTTP_X_HUB_SIGNATURE'
+ */
+$hubSignature = $_SERVER['HTTP_X_HUB_SIGNATURE'];
+
+/*
+ * obtain the 'gitHubEvent'; for example, from the value of the HTTP header 'HTTP_X_GITHUB_EVENT'
+ */
+$gitHubEvent = $_SERVER['HTTP_X_GITHUB_EVENT'];
+
+/*
+ * instiantate a Webhook\Request object...
+ */
+$request = new \Webhook\Request($messageBody, $hubSignature, $gitHubEvent);
+
+/*
  * instantiate 'Callback' controller object
  */
-$callback = new \Webhook\Callback($hubSecret,function(\Webhook\Payload $payload ) use (&$config) {
+$callback = new \Webhook\Callback($hubSecret,function(\Webhook\Payload $payload) {
    echo "event: ".$payload->getEvent()."\n";
    if ($payload instanceof \Webhook\Payload\PushEvent) {
      //
@@ -105,20 +125,10 @@ $callback = new \Webhook\Callback($hubSecret,function(\Webhook\Payload $payload 
 });
 
 try {
-   /*
-    * generate a 'Request' object to process the Webhook 'payload' (should be in the request body)
-    */
-   $request = \Webhook\Request::service(file_get_contents('php://input'),isset($_SERVER)?$_SERVER:[]);
-   /*
-    * if it's not a "POST" request method, force an error response
-    */
-   if ($request->getRequestMethod()!=='POST') {
-      throw new \Webhook\InvalidRequest("requestMethod must be POST");
-   }
-   /*
-    * process the request with the 'Callback' controller object
-    */
-   $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
+  /*
+   * validate the request with the 'Callback' controller object
+   */
+  $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
 } catch(\Webhook\InvalidRequest $e) {
    /*
     * force a 500 HTTP response code upon encountering an 'InvalidRequest' exception,
