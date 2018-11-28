@@ -175,7 +175,7 @@ An end-point example is provided at [web/endpoint-example.php](web/endpoint-exam
      ```php
      $config['Secret'] = 'My Secret';
      ```
-     * leave the value of `$config['RepoPath']` empty to skip the repo update, or change it to the local system path to a repository to perform a `git update` on every 'push' Webhook event:
+     * leave the value of `$config['RepoPath']` empty to skip the repo update, or change it to the local system path of a repository to perform a `git update` on every 'push' Webhook event:
      
      ```php
      $config['RepoPath'] = '';
