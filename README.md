@@ -157,7 +157,7 @@ if ($hash !== hash_hmac($algo, $messageBody, $hubSecret)) {
 
 ### Using the provided end-point example
 
-An end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php) which responds to a **PushEvent** by invoking 'pull' or 'update' commands on a local git or svn repository as appropriate. It also responds to a a **PingEvent** with a success message.
+An end-point example is provided at [web/endpoint-example.php](web/endpoint-example.php) which responds to a **PushEvent** by invoking a 'git pull' or any custom code placed in a callback function, as configured. It also responds to a a **PingEvent** with a success message.
 
    * copy the provided [web/endpoint-example.php](web/endpoint-example.php)...
    
