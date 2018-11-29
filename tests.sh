@@ -210,8 +210,7 @@ if [ -n "$TEST_SUITE" ]; then
       	    cmd_status_filter $?
       	    exit
      	   }
-     	   printf "\n$(print_phpunit_text_coverage_path $TEST_SUFFIX):\n"
-     	   cat $(print_phpunit_text_coverage_path $TEST_SUFFIX)
+     	   print_phpunit_coverage_report $TEST_SUFFIX
          exit 0
       fi
       ;; 
