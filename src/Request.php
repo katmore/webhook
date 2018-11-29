@@ -3,56 +3,70 @@ namespace Webhook;
 
 class Request {
    
-   
    /**
-    * @var string
-    *    The raw payload of this delivery.
+    * @var string The raw payload of this delivery.
+    * @private
     */
    private $_messageBody;
    
    /**
-    * @var string
-    *    The content-Type of the payload.
+    * @var string The content-Type of the payload.
+    * @private
     */
    private $_contentType;
    
    /**
     * @var string GitHub Event Type of this delivery.
+    * @private
     */
    private $_gitHubEvent;
    
    /**
-    * @var string
-    *    The Hub-Signature provided along with this delivery.
+    * @var string The Hub-Signature provided along with this delivery.
+    * @private
     */
    private $_hubSignature;
    
    /**
-    * @var string
-    *    The UUID of this delivery.
+    * @var string The UUID of this delivery.
+    * @private
     */
    private $_gitHubDelivery;
    
    /**
-    * @var string
-    *    The request method of this delivery.
+    * @var string The request method of this delivery.
+    * @private
     */
    private $_requestMethod;
    
    /**
-    * @var string
-    *    The user-agent reported for this delivery.
+    * @var string The user-agent reported for this delivery.
+    * @private
     */
    private $_userAgent;
    
    /**
     * @var \Webhook\Payload
+    * @private
     */
    private $_payload;
    
    /**
+    * Service parameter key names.
+    * @see \Webhook\Request::service()
+    */
+   const SERVICE_PARAMS = [
+      'HTTP_X_HUB_SIGNATURE',
+      'HTTP_X_GITHUB_EVENT',
+      'CONTENT_TYPE',
+      'HTTP_X_GITHUB_DELIVERY',
+      'REQUEST_METHOD',
+      'HTTP_USER_AGENT',
+   ];
+   
+   /**
     * Provides a webhook request object from specified paramaters.
-    *    Suitable for use in conjunction with the $_SERVER array.
+    *    Suitable for use in conjunction with the $_SERVER superglobal.
     *
     * @param string $messageBody request message body
     * @param array $param assoc array of paramaters:<ul>
@@ -64,17 +78,12 @@ class Request {
     *    <li><b>string $param['HTTP_USER_AGENT']</b> HTTP_USER_AGENT.</li>
     * </ul>
     *
-    * @return \Webhook\Request
+    * @return \Webhook\Request request object
+    * 
+    * @see $_SERVER
     */
    public static function service(string $messageBody,array $param=null) {
-      $request = [
-         'HTTP_X_HUB_SIGNATURE'=>'',
-         'HTTP_X_GITHUB_EVENT'=>'',
-         'CONTENT_TYPE'=>'',
-         'HTTP_X_GITHUB_DELIVERY'=>'',
-         'REQUEST_METHOD'=>'',
-         'HTTP_USER_AGENT'=>'',
-      ];
+      $request = array_fill_keys(static::SERVICE_PARAMS, '');
       if (!empty($param)) {
          foreach($request as $k=>&$v) {
             if (isset($param[$k])) $v=$param[$k];
@@ -173,7 +182,9 @@ class Request {
    }
    
    /**
-    * @return \Webhook\Payload
+    * Provides the payload object of this delivery.
+    * 
+    * @return \Webhook\Payload payload object
     */
    public function getPayload(): Payload {  
       
@@ -181,7 +192,8 @@ class Request {
    }
    
    /**
-    * @return string The raw payload of this delivery.
+    * Provides the raw message body of this delivery.
+    * @return string message body
     */
    public function getMessageBody(): string {
       
@@ -190,8 +202,8 @@ class Request {
    }
    
    /**
-    * @return string
-    *    The content-Type of the payload.
+    * Provides the content-Type of the payload.
+    * @return string content-Type
     */
    public function getContentType(): string {
       
@@ -200,7 +212,8 @@ class Request {
    }
    
    /**
-    * @return string GitHub Event Type of this delivery.
+    * Provides the GitHub Event Type of this delivery.
+    * @return string GitHub Event Type
     */
    public function getGitHubEvent(): string {
       
@@ -209,8 +222,8 @@ class Request {
    }
    
    /**
-    * @return string
-    *    The Hub-Signature provided along with this delivery.
+    * Provides the Hub-Signature provided along with this delivery.
+    * @return string Hub-Signature
     */
    public function getHubSignature(): string {
    
@@ -219,8 +232,8 @@ class Request {
    }
    
    /**
-    * @return string
-    *    The UUID of this delivery.
+    * Provides the UUID of this delivery.
+    * @return string UUID
     */
    public function getGitHubDelivery(): string {
       
@@ -229,8 +242,8 @@ class Request {
    }
    
    /**
-    * @return string
-    *    The request method of this delivery.
+    * Provides the request method of this delivery.
+    * @return string request method
     */
    public function getRequestMethod(): string {
       
@@ -239,8 +252,8 @@ class Request {
    }
    
    /**
-    * @return string
-    *    The user-agent reported for this delivery.
+    * Provides the user-agent reported for this delivery.
+    * @return string user-agent
     */
    public function getUserAgent(): string {
       

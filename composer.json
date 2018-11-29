@@ -15,5 +15,16 @@
         "psr-4": { 
             "Webhook\\": "src"
          }
-    }    
+    },
+    "autoload-dev": {
+        "psr-4": { 
+            "Webhook\\TestCase\\": "tests/phpunit/TestCase", 
+            "Webhook\\Tests\\": "tests/phpunit/Tests"
+         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7",
+        "phpunit/php-code-coverage": "^6.0",
+        "php-di/phpdoc-reader": "^2.1"
+    }
 }

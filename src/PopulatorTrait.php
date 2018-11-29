@@ -7,12 +7,11 @@ namespace Webhook;
 trait PopulatorTrait {
    
    /**
-    * Instantiates a new object of this class; assigning values to any public properties of the new object
-    *    corresponding element values with matching keys names of the specified map array. If this class
-    *    implements the \Webhook\ 
+    * Populates this object by assigning values to any public properties of the new object
+    *    corresponding element values with matching keys names of the specified map array.
     *
     * @param array $input
-    * @return object
+    * @return object populated object
     */
    public function populateFromArray(array $input) {
       $object = $this;
@@ -26,11 +25,11 @@ trait PopulatorTrait {
    }
    
    /**
-    * Instantiates a new object of this class; assigning values to any public properties of the new object
+    * Populates this object by assigning values to any public properties of the new object
     *    corresponding matching public properties with matching names of the specified map object.
     * 
     * @param object $input 
-    * @return object
+    * @return object populated object
     */
    public function populateFromObject($input) {
       

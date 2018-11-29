@@ -10,10 +10,6 @@ use Webhook\PopulateListener;
  * @see https://developer.github.com/v3/activity/events/types/#pushevent
  */
 class Commit implements Populatable,PopulateListener  {
-   /**
-    * @var string The SHA of the commit.
-    */
-   public $sha;
    
    use CommitTrait;
    

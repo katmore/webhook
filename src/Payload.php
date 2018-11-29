@@ -1,12 +1,16 @@
 <?php
 namespace Webhook;
 
-use \Webhook\PayloadData\Sender;
-use \Webhook\PayloadData\Organization;
-use \Webhook\PayloadData\Repository;
+use Webhook\PayloadData\Sender;
+use Webhook\PayloadData\Organization;
+use Webhook\PayloadData\Repository;
 
 abstract class Payload implements Populatable, PopulateListener {
    
+   /**
+    * Provides the event name.
+    * @return string
+    */
    abstract public function getEvent():string;
    
    /**
@@ -26,6 +30,10 @@ abstract class Payload implements Populatable, PopulateListener {
    
    use PopulatorTrait;
    
+   /**
+    * Indicates that the populating of this Payload object is complete.
+    * @return void
+    */
    public function populateComplete() {
       
       if (!$this->sender instanceof Sender) {
@@ -42,6 +50,9 @@ abstract class Payload implements Populatable, PopulateListener {
       
    }
    
+   /**
+    * @param object $input payload input
+    */
    public function __construct($input) {
       $this->populateFromObject($input);
    }

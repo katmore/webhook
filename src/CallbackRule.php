@@ -3,13 +3,22 @@ namespace Webhook;
 
 abstract class CallbackRule {
 
+   /**
+    * Provides the rule value.
+    * @return string
+    */
    public function __toString() {
       return $this->getValue();
    }
    /**
-    * @var string
+    * @var string rule value
+    * @private
     */
    protected $_ruleValue;
+   /**
+    * Provides the rule value.
+    * @return string
+    */
    public function getValue():string {
       if(
             ( !is_array( $this->_ruleValue ) ) &&
@@ -21,5 +30,8 @@ abstract class CallbackRule {
       }
       return "";
    }
+   /**
+    * @param string $ruleValue the rule value
+    */
    abstract public function __construct(string $ruleValue);
 }

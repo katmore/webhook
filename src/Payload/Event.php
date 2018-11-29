@@ -3,19 +3,35 @@ namespace Webhook\Payload;
 
 use Webhook\Payload;
 
-class Event extends Payload {
+class Event extends Payload implements EventProviderInterface {
+   
    /**
-    * @var string
+    * Populates a "generic" Payload <b>Event</b> object corresponding to this event.
+    * @return \Webhook\Payload\Event
+    */
+   public function toEvent() : Event {
+      return $this;
+   }
+   
+   /**
+    * @var string event name
+    * @private
     */
    private $_event;
+   /**
+    * Provides the event name.
+    * @return string
+    */
    public function getEvent(): string {
       return $this->_event;
    }
    
    /**
-    * @var array
+    * @var array assoc array of payload data
+    * @private
     */
    private $_payloadData=[];
+   
    /**
     * @return array assoc array of payload data.
     * @see https://developer.github.com/v3/activity/events/types/ for assoc key's and potential values.
@@ -29,6 +45,7 @@ class Event extends Payload {
     * @param string $gitHubEvent gitHubEvent name
     */
    public function __construct($input,string $gitHubEvent) {
+      
       parent::__construct($input);
       
       $this->_event = $gitHubEvent;
@@ -45,7 +62,6 @@ class Event extends Payload {
       }
       unset($p);
       unset($v);
-      
       
    }
    

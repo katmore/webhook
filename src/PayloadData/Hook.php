@@ -4,18 +4,16 @@ namespace Webhook\PayloadData;
 use Webhook\Populatable;
 use Webhook\PopulatorTrait;
 use Webhook\PopulateListener;
-use Webhook\PayloadData\HookConfig;
-use Webhook\PayloadData\LastResponse;
 
 class Hook implements Populatable,PopulateListener  {
    
    /**
-    * @var string The webhook's id.
+    * @var int The webhook's id.
     */
    public $id;
    
    /**
-    * @var string Points to the webhook's API resource.
+    * @var string The URL this webhook will perform a POST request on.
     */
    public $url;
    
@@ -30,12 +28,12 @@ class Hook implements Populatable,PopulateListener  {
    public $events;
    
    /**
-    * @var boolean Wheather or not this webhook is active.
+    * @var bool true if this webhook is active, <b>bool</b> false otherwise
     */
    public $active;
    
    /**
-    * @var \Webhook\PayloadData\HookConfig
+    * @var \Webhook\PayloadData\HookConfig hook config object
     */
    public $config;
    
@@ -50,12 +48,16 @@ class Hook implements Populatable,PopulateListener  {
    public $created_at;
    
    /**
-    * @var \Webhook\PayloadData\LastResponse
+    * @var \Webhook\PayloadData\LastResponse last response object
     */
    public $last_response;
    
    use PopulatorTrait;
    
+   /**
+    * Indicates that the populating of this object is complete.
+    * @return void
+    */
    public function populateComplete() {
       
       if ((!$this->config instanceof HookConfig) && is_object($this->config)) {

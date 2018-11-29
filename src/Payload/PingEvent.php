@@ -4,27 +4,59 @@ namespace Webhook\Payload;
 use Webhook\Payload;
 use Webhook\PayloadData\Hook;
 
-class PingEvent extends Payload {
-   
-   public function getEvent(): string {
-      return "ping";
-   }
+class PingEvent extends Payload implements EventProviderInterface {
    
    /**
-    * @var string Random string of GitHub zen.
+    * @var string The random message generated for this ping event.
     */
    public $zen;
    
    /**
-    * @var string The ID of the webhook that triggered the ping.
+    * @var int The ID of the webhook that triggered this ping event.
     */
    public $hook_id;
    
    /**
-    * @var \Webhook\PayloadData\Hook The webhook configuration.
+    * @var \Webhook\PayloadData\Hook hook object
     */
    public $hook;
    
+   /**
+    * @var object
+    * @private
+    */
+   private $input;
+   
+   const EVENT_NAME = 'ping';
+   
+   /**
+    * Populates a "generic" Payload <b>Event</b> object corresponding to this event.
+    * @return \Webhook\Payload\Event
+    */
+   public function toEvent() : Event {
+      return new Event($this->input,static::EVENT_NAME);
+   }
+   
+   /**
+    * Provides the event name.
+    * @return string
+    */
+   public function getEvent(): string {
+      return static::EVENT_NAME;
+   }
+   
+   /**
+    * @param object $input payload input
+    */
+   public function __construct($input) {
+      $this->input = $input;
+      parent::__construct($input);
+   }
+   
+   /**
+    * Indicates that the populating of this Payload object is complete.
+    * @return void
+    */
    public function populateComplete() {
       parent::populateComplete();
       

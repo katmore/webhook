@@ -11,18 +11,6 @@ use Webhook\PopulateListener;
  */
 class HeadCommit implements Populatable,PopulateListener  {
    
-   /**
-    * @var string
-    *    The SHA of the commit.
-    */
-   public $id;
-   
-   /**
-    * @var string
-    *    The SHA of the tree associated with commit.
-    */
-   public $tree_id;
-   
    use CommitTrait;
    
    use PopulatorTrait;

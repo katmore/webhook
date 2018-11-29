@@ -2,11 +2,22 @@
 namespace Webhook;
 
 class InvalidRequest extends \Exception {
-   public function getReason() {
+   /**
+    * Provides the reason the request was invalid.
+    * @return string reason
+    */
+   public function getReason(): string {
       return $this->_reason;
    }
+   /**
+    * @var string reason the request was invalid
+    * @private
+    */
    private $_reason;
-   public function __construct($reason) {
+   /**
+    * @param string reason the request was invalid
+    */
+   public function __construct(string $reason) {
       $this->_reason = $reason;
       parent::__construct($reason);
    }

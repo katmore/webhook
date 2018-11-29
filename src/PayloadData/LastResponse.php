@@ -7,17 +7,17 @@ use Webhook\PopulatorTrait;
 class LastResponse implements Populatable {
    
    /**
-    * @var string
+    * @var int http response code
     */
    public $code;
    
    /**
-    * @var string
+    * @var string response status string
     */
    public $status;
    
    /**
-    * @var string
+    * @var string response message
     */
    public $message;
    

@@ -6,42 +6,42 @@ use Webhook\PopulatorTrait;
 
 class Sender implements Populatable {
    /**
-    * @var string 
+    * @var string the github username of the event sender
     */
    public $login;
    
    /**
-    * @var string
+    * @var int the unique github ID of the event sender
     */
    public $id;
    
    /**
-    * @var string
+    * @var string the avatar URL of the event sender
     */
    public $avatar_url;
    
    /**
-    * @var string
+    * @var string the gravatar ID, if any, of the event sender
     */
-   public $gravitar_id;
+   public $gravatar_id;
    
    /**
-    * @var string
+    * @var string the github API URL of the event sender
     */
    public $url;
    
    /**
-    * @var string
+    * @var string the github URL of the event sender
     */
    public $html_url;
    
    /**
-    * @var string
+    * @var string the type of event sender (i.e. "User")
     */
    public $type;
    
    /**
-    * @var string
+    * @var bool true if event sender is a site admin, <b>bool</b> false otherwise
     */
    public $site_admin;
    

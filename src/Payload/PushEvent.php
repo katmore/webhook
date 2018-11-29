@@ -12,10 +12,6 @@ use Webhook\PayloadData\Pusher;
  */
 class PushEvent extends Payload {
    
-   public function getEvent(): string {
-      return "push";
-   }
-   
    /**
     * @var string
     *    The full Git ref that was pushed. Example: "refs/heads/master".
@@ -55,6 +51,42 @@ class PushEvent extends Payload {
     */
    public $pusher;
    
+   /**
+    * @var object
+    * @private
+    */
+   private $input;
+   
+   const EVENT_NAME = 'push';
+   
+   /**
+    * Populates a "generic" Payload <b>Event</b> object corresponding to this event.
+    * @return \Webhook\Payload\Event
+    */
+   public function toEvent() : Event {
+      return new Event($this->input,static::EVENT_NAME);
+   }
+   
+   /**
+    * Provides the event name.
+    * @return string
+    */
+   public function getEvent(): string {
+      return static::EVENT_NAME;
+   }
+   
+   /**
+    * @param object $input payload input
+    */
+   public function __construct($input) {
+      $this->input = $input;
+      parent::__construct($input);
+   }
+   
+   /**
+    * Indicates that the populating of this Payload object is complete.
+    * @return void
+    */
    public function populateComplete() {
       parent::populateComplete();
       

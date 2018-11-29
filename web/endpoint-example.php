@@ -9,7 +9,9 @@ use Webhook\InvalidRequest;
 use Webhook\Payload;
 use Webhook\UrlCallbackRule;
 
-require __DIR__."/../vendor/autoload.php";
+if (is_file(__DIR__."/../vendor/autoload.php")) {
+   require __DIR__."/../vendor/autoload.php";
+}
 
 /*
  * string $config['RepoUrl']
@@ -27,12 +29,29 @@ $config['Secret'] = 'My Secret';
 function onPushEvent(Payload\PushEvent $payload) {
    /*
     *
-    * --- place code in this function --
-    * --- that should execute when a Github 'push' event occurs --
+    * --- place code in this function ---
+    * --- that should execute when a Github 'push' event occurs ---
     *
     */
 }
 
+function onPingEvent(Payload\PingEvent $payload) {
+   /*
+    *
+    * --- place code in this function --
+    * --- that should execute when a Github 'ping' event occurs ---
+    *
+    */
+}
+
+function onOtherEvent(Payload\Event $payload) {
+   /*
+    *
+    * --- place code in this function ---
+    * --- that should execute when a Github event occurs other than 'ping' or 'push' ---
+    *
+    */
+}
 
 /*
  * string $config['RepoPath']
@@ -47,7 +66,7 @@ header('Content-Type: text/plain');
 $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$config) {
    
    /*
-    * on a "push" event, do a "git pull" on the local system copy of the repo
+    * "push" event
     */
    if ($payload instanceof Payload\PushEvent) {
       
@@ -56,6 +75,9 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
          http_response_code(500);
       }
       
+      /*
+       * do a "git pull" on the local system copy of the repo
+       */
       if (!empty($config['RepoPath'])) {
       
          if (is_dir($config['RepoPath'])) {
@@ -67,13 +89,12 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
          
             if ($exit_status!=0) echo "exit status: $exit_status\n";
          } else {
-            echo "skipped 'git update' because the path was invalid, see \$config['RepoPath']\n";
+            echo "skipped 'git pull' because the path was invalid, see \$config['RepoPath']\n";
          }
          
       }
       
       echo "event: ".$payload->getEvent()."\n";
-      echo "zen: ".$payload->zen."\n";
       
       echo "sender login: ".$payload->sender->login."\n";
       echo "sender avatar_url: ".$payload->sender->avatar_url."\n";
@@ -86,10 +107,18 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
    }
    
    /*
-    * on a "ping" event, do a "git pull" on the local system copy of the repo
+    * "ping" event
     */
    if ($payload instanceof Payload\PingEvent) {
       
+      $ret = onPingEvent($payload);
+      if ($ret===false) {
+         http_response_code(500);
+      }
+      
+      /*
+       * do a "git status" on the local system copy of the repo
+       */
       if (!empty($config['RepoPath'])) {
       
          if (is_dir($config['RepoPath'])) {
@@ -107,17 +136,23 @@ $callback = new Callback($config['Secret'],function(Payload $payload ) use (&$co
       }
       
       echo "event: ".$payload->getEvent()."\n";
-      echo "zen: ".$payload->zen;
-      
       echo "sender login: ".$payload->sender->login."\n";
       echo "sender avatar_url: ".$payload->sender->avatar_url."\n";
+      
+      echo "zen: ".$payload->zen;
       
       return;
       
    }
    
-   http_response_code (500);
-   echo "unrecognized event: ".$payload->getEvent();
+   $ret = onOtherEvent($payload);
+   if ($ret===false) {
+      http_response_code(500);
+   }
+   
+   echo "event: ".$payload->getEvent()."\n";
+   echo "sender login: ".$payload->sender->login."\n";
+   echo "sender avatar_url: ".$payload->sender->avatar_url."\n";
    
 },new UrlCallbackRule($config['RepoUrl']));
 
@@ -131,10 +166,7 @@ register_shutdown_function(function() {
 });
 
 try {
-   $request = Request::service(
-         file_get_contents('php://input'),
-         isset($_SERVER)?$_SERVER:[]
-         );
+   $request = Request::service(file_get_contents('php://input'),isset($_SERVER)?$_SERVER:[]);
    if ($request->getRequestMethod()!=='POST') {
       throw new InvalidRequest("requestMethod must be POST");
    }
