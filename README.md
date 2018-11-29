@@ -178,7 +178,7 @@ An end-point example is provided at [web/endpoint-example.php](web/endpoint-exam
      ```
     
 ## Unit Tests
- * ['coverage.txt'](./coverage.txt): unit test coverage summary
+ * [`coverage.txt`](./coverage.txt): unit test coverage report
  * [`phpunit.xml`](./phpunit.xml): PHPUnit configuration file
  * [`tests/phpunit`](./tests/phpunit): source code for unit tests
 
