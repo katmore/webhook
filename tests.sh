@@ -198,6 +198,7 @@ if [ -n "$TEST_SUITE" ]; then
       	 cmd_status_filter $?
       	 exit
       }
+      print_phpunit_coverage_report
       exit 0
    fi
    case $TEST_SUITE in
