@@ -192,7 +192,7 @@ Execute phpunit located in the `vendor/bin` directory.
 vendor/bin/phpunit
 ```
 
-The `tests.sh` wrapper script is available for convenience.
+The [`tests.sh`](./tests.sh) wrapper script is available for convenience.
 ```sh
 ./tests.sh
 ```
