@@ -5,12 +5,25 @@ use Webhook\Payload;
 use Webhook\PayloadData\Commit;
 use Webhook\PayloadData\HeadCommit;
 use Webhook\PayloadData\Pusher;
+use Webhook\PayloadData\Organization;
+use Webhook\PayloadData\Repository;
 
 /**
  * Payload data provided by PushEvent
  * @see https://developer.github.com/v3/activity/events/types/#pushevent
  */
 class PushEvent extends Payload {
+   
+   
+   /**
+    * @var \Webhook\PayloadData\Organization
+    */
+   public $organization;
+   
+   /**
+    * @var \Webhook\PayloadData\Repository
+    */
+   public $repository;
    
    /**
     * @var string
@@ -102,6 +115,14 @@ class PushEvent extends Payload {
       
       if ((!$this->pusher instanceof Pusher) && is_object($this->pusher)) {
          $this->pusher = (new Pusher)->populateFromObject($this->pusher);
+      }
+      
+      if (!$this->organization instanceof Organization) {
+         $this->organization = (new Organization)->populateFromObject($this->organization);
+      }
+      
+      if (!$this->repository instanceof Repository) {
+         $this->repository = (new Repository)->populateFromObject($this->repository);
       }
    }
 }

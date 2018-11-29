@@ -27,6 +27,8 @@ class HookDataTest extends TestCase {
    
    /**
     * @dataProvider pingEventHookObjectProvider
+    * @covers \Webhook\PayloadData\Hook::populateComplete()
+    * @covers \Webhook\PayloadData\Hook::populateFromObject()
     */
    public function testPingEventHook(stdClass $hook_obj) {
       $hook = new Hook;

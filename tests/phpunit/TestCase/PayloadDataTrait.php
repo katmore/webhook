@@ -11,7 +11,7 @@ use InvalidArgumentException;
 
 trait PayloadDataTrait {
    
-   public function payloadIterableTests(  $object_node,  $data_node) {
+   public function payloadIterableTests(  $object_node,  $data_node, string $node_name="") {
       
       if (!is_object($object_node) && !is_array($object_node)) {
          throw new InvalidArgumentException('$object_node argument must be an object or array type, instead got: '.gettype($object_node));
@@ -29,20 +29,20 @@ trait PayloadDataTrait {
       
       foreach($data_node as $key=>$val) {
          if (is_array($data_node)) {
-            $this->assertArrayHasKey($key, $object_node);
+            $this->assertArrayHasKey($key, $object_node,"Failed on: $node_name.$key");
             $object_node_value = $object_node[$key];
          } else {
-            $this->assertObjectHasAttribute($key, $object_node);
+            $this->assertObjectHasAttribute($key, $object_node,"Failed on: $node_name.$key");
             $object_node_value = $object_node->$key;
          }
          if (is_scalar($val)) {
-            $this->assertEquals($object_node_value, $val);
+            $this->assertEquals($object_node_value, $val,"Failed on: $node_name.$key");
          } else if (is_array($val)) {
-            $this->assertInternalType('array', $object_node_value);
-            $this->payloadIterableTests($object_node_value, $val);
+            $this->assertInternalType('array', $object_node_value,"Failed on: $node_name.$key");
+            $this->payloadIterableTests($object_node_value, $val,$node_name.".$key");
          } else if (is_object($val)) {
-            $this->assertInternalType('object', $object_node_value);
-            $this->payloadIterableTests($object_node_value, $val);
+            $this->assertInternalType('object', $object_node_value,"Failed on: $node_name.$key");
+            $this->payloadIterableTests($object_node_value, $val,$node_name.".$key");
          }
       }
       unset($key);
@@ -62,10 +62,10 @@ trait PayloadDataTrait {
             $rp = $r->getProperty($prop);
             $propClass = $reader->getPropertyClass($rp);
             $this->assertAttributeInstanceOf($propClass, $prop, $data);
-            $this->payloadIterableTests($object->$prop, $val);
+            $this->payloadIterableTests($object->$prop, $val,get_class($data).".$prop");
          } else if (is_array($val)) {
             $this->assertAttributeInternalType('array', $prop, $object);
-            $this->payloadIterableTests($object->$prop, $val);
+            $this->payloadIterableTests($object->$prop, $val,get_class($data).".$prop");
          }
       }
    }

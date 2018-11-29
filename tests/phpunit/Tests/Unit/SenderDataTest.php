@@ -27,6 +27,7 @@ class SenderDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventSenderObjectProvider
+    * @covers \Webhook\PayloadData\Sender::populateFromObject()
     */
    public function testPushEventSender(stdClass $sender_obj) {
       $sender = new Sender;

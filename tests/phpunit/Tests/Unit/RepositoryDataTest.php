@@ -27,6 +27,8 @@ class RepositoryDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventRepositoryObjectProvider
+    * @covers \Webhook\PayloadData\Repository::populateComplete()
+    * @covers \Webhook\PayloadData\Repository::populateFromObject()
     */
    public function testPushEventRepository(stdClass $repository_obj) {
       $repository = new Repository;

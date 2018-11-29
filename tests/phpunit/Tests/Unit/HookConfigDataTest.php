@@ -33,6 +33,7 @@ class HookConfigDataTest extends TestCase {
    
    /**
     * @dataProvider pingEventHookConfigObjectProvider
+    * @covers \Webhook\PayloadData\HookConfig::populateFromObject()
     */
    public function testPingEventHookConfig(stdClass $hook_config_obj) {
       $hookConfig = new HookConfig;

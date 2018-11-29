@@ -56,12 +56,8 @@ class Event extends Payload implements EventProviderInterface {
       }
       unset($v);
       
-      foreach((array) $input as $p=>$v) {
-         if (in_array($p,$pubProp,true)) continue;
-         $this->_payloadData[$p] = $v;
-      }
-      unset($p);
-      unset($v);
+      $this->_payloadData = json_decode(json_encode($input),true);
+      
       
    }
    

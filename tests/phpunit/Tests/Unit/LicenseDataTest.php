@@ -33,6 +33,7 @@ class LicenseDataTest extends TestCase {
    
    /**
     * @dataProvider pingEventLicenseObjectProvider
+    * @covers \Webhook\PayloadData\License::populateFromObject()
     */
    public function testPingEventLicense(stdClass $license_obj) {
       $license = new License;

@@ -4,6 +4,10 @@ namespace Webhook\TestCase;
 
 trait PingPayloadTrait {
    
+   public static function getExpectedPingEventName() : string {
+      return 'ping';
+   }
+   
    public function pingRequestObjectProvider() : array {
       return [
          [static::getPingRequestObject()],

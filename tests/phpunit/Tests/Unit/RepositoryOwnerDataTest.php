@@ -33,6 +33,7 @@ class RepositoryOwnerDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventRepositoryOwnerObjectProvider
+    * @covers \Webhook\PayloadData\RepositoryOwner::populateFromObject()
     */
    public function testPushEventRepositoryOwner(stdClass $repository_owner_obj) {
       $repositoryOwner = new RepositoryOwner;

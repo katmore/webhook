@@ -1,0 +1,26 @@
+
+
+Code Coverage Report:     
+  2018-11-29 09:49:46     
+                          
+ Summary:                 
+  Classes: 57.14% (8/14)  
+  Methods: 46.15% (18/39) 
+  Lines:   30.60% (71/232)
+
+\Webhook::PopulatorTrait
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 11/ 11)
+\Webhook::Webhook\Payload
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  5/  5)
+\Webhook\Payload::Webhook\Payload\Event
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 11/ 11)
+\Webhook\Payload::Webhook\Payload\PingEvent
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 11/ 11)
+\Webhook\Payload::Webhook\Payload\PushEvent
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 18/ 18)
+\Webhook\PayloadData::CommitTrait
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)
+\Webhook\PayloadData::Webhook\PayloadData\Hook
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)
+\Webhook\PayloadData::Webhook\PayloadData\Repository
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)

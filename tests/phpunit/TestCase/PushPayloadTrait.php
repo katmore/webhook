@@ -4,6 +4,10 @@ namespace Webhook\TestCase;
 
 trait PushPayloadTrait {
    
+   public static function getExpectedPushEventName() : string {
+      return 'push';
+   }
+   
    public function pushRequestObjectProvider() : array {
       return [
          [static::getPushRequestObject()],

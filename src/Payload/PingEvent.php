@@ -3,6 +3,7 @@ namespace Webhook\Payload;
 
 use Webhook\Payload;
 use Webhook\PayloadData\Hook;
+use Webhook\PayloadData\PingRepository;
 
 class PingEvent extends Payload implements EventProviderInterface {
    
@@ -20,6 +21,11 @@ class PingEvent extends Payload implements EventProviderInterface {
     * @var \Webhook\PayloadData\Hook hook object
     */
    public $hook;
+   
+   /**
+    * @var \Webhook\PayloadData\PingRepository
+    */
+   public $repository;
    
    /**
     * @var object
@@ -62,6 +68,10 @@ class PingEvent extends Payload implements EventProviderInterface {
       
       if ((!$this->hook instanceof Hook) && is_object($this->hook)) {
          $this->hook = (new Hook)->populateFromObject($this->hook);
+      }
+      
+      if (!$this->repository instanceof PingRepository) {
+         $this->repository = (new PingRepository)->populateFromObject($this->repository);
       }
    }
 }

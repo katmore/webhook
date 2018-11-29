@@ -30,6 +30,8 @@ class CommitDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventCommitsElementsProvider
+    * @covers \Webhook\PayloadData\Commit::populateComplete()
+    * @covers \Webhook\PayloadData\Commit::populateFromObject()
     */
    public function testPushEventCommitsElements(stdClass $commit_element)  {
       

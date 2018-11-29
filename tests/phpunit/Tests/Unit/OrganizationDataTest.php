@@ -27,6 +27,7 @@ class OrganizationDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventOrganizationObjectProvider
+    * @covers \Webhook\PayloadData\Organization::populateFromObject()
     */
    public function testPushEventOrganization(stdClass $organization_obj) {
       $organization = new Organization;

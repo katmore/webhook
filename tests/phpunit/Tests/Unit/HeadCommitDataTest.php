@@ -27,6 +27,8 @@ class HeadCommitDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventHeadCommitObjectProvider
+    * @covers \Webhook\PayloadData\HeadCommit::populateComplete()
+    * @covers \Webhook\PayloadData\HeadCommit::populateFromObject()
     */
    public function testPushEventHeadCommit(stdClass $head_commit_obj) {
       $headCommit = new HeadCommit;

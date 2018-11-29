@@ -27,6 +27,7 @@ class PusherDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventPusherObjectProvider
+    * @covers \Webhook\PayloadData\Pusher::populateFromObject()
     */
    public function testPushEventPusher(stdClass $pusher_obj) {
       $pusher = new Pusher;

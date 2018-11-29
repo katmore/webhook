@@ -33,6 +33,7 @@ class LastResponseDataTest extends TestCase {
    
    /**
     * @dataProvider pingEventLastResponseObjectProvider
+    * @covers \Webhook\PayloadData\LastResponse::populateFromObject()
     */
    public function testPingEventLastResponse(stdClass $last_response_obj) {
       $lastResponse = new LastResponse;

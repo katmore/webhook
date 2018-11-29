@@ -40,6 +40,7 @@ class GitUserDataTest extends TestCase {
    
    /**
     * @dataProvider pushEventGitUserProvider
+    * @covers \Webhook\PayloadData\GitUser::populateFromObject()
     */
    public function testPushEventGitUser(stdClass $git_user_obj) {
       $gitUser = new GitUser;
