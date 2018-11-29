@@ -177,6 +177,26 @@ An end-point example is provided at [web/endpoint-example.php](web/endpoint-exam
      }
      ```
     
+## Unit Tests
+Unit tests are defined in [`phpunit.xml`](./phpunit.xml), the unit test source files are contained in the [`tests/phpunit`](./tests/phpunit) directory.
+
+To perform unit tests, install dev dependencies using composer.
+
+```sh
+cd webhook
+composer update
+```
+
+Execute phpunit located in the `vendor/bin` directory.
+```sh
+vendor/bin/phpunit
+```
+
+The `tests.sh` wrapper script is available for convenience.
+```sh
+./tests.sh
+```
+
 
 ## Legal
 "Webhook" is distributed under the terms of the [MIT license](LICENSE) or the [GPLv3](GPLv3) license.
