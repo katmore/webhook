@@ -5,7 +5,7 @@
  */
 use Webhook\Callback;
 use Webhook\Request;
-use Webhook\InvalidRequest;
+use Webhook\InvalidRequestException;
 use Webhook\Payload;
 use Webhook\UrlCallbackRule;
 
@@ -168,11 +168,11 @@ register_shutdown_function(function() {
 try {
    $request = Request::service(file_get_contents('php://input'),isset($_SERVER)?$_SERVER:[]);
    if ($request->getRequestMethod()!=='POST') {
-      throw new InvalidRequest("requestMethod must be POST");
+      throw new InvalidRequestException("requestMethod must be POST");
    }
    $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
-} catch(InvalidRequest $e) {
+} catch(InvalidRequestException $e) {
    http_response_code(500);
-   echo "Invalid Request: ".$e->getMessage();
+   echo $e->getMessage();
 }
 

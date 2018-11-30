@@ -1,17 +1,29 @@
 
 
-Code Coverage Report:     
-  2018-11-29 09:49:46     
-                          
- Summary:                 
-  Classes: 57.14% (8/14)  
-  Methods: 46.15% (18/39) 
-  Lines:   30.60% (71/232)
+Code Coverage Report:      
+  2018-11-30 01:39:31      
+                           
+ Summary:                  
+  Classes: 66.67% (12/18)  
+  Methods: 72.09% (31/43)  
+  Lines:   54.21% (116/214)
 
 \Webhook::PopulatorTrait
   Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 11/ 11)
+\Webhook::Webhook\EventMissingException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  2/  2)
+\Webhook::Webhook\InvalidRequestException
+  Methods:  50.00% ( 1/ 2)   Lines:  75.00% (  3/  4)
+\Webhook::Webhook\MessageBodyInvalidException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  2/  2)
 \Webhook::Webhook\Payload
   Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  5/  5)
+\Webhook::Webhook\Request
+  Methods:  66.67% ( 8/12)   Lines:  66.67% ( 34/ 51)
+\Webhook::Webhook\SignatureInvalidException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  2/  2)
+\Webhook::Webhook\SignatureMissingException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  2/  2)
 \Webhook\Payload::Webhook\Payload\Event
   Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 11/ 11)
 \Webhook\Payload::Webhook\Payload\PingEvent

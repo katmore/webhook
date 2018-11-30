@@ -41,6 +41,7 @@ while getopts :?qhua-: arg; do { case $arg in
       html-coverage) HTML_COVERAGE_REPORT=1;;
       print-coverage) PRINT_COVERAGE=1;;
       show-coverage) PRINT_COVERAGE=1;;
+      coverage) PRINT_COVERAGE=1;;
       *) >&2 echo "$ME_NAME: unrecognized long option --$OPTARG"; OPTION_STATUS=$ME_ERROR_USAGE;;
    esac ;; 
    *) >&2 echo "$ME_NAME: unrecognized option -$OPTARG"; OPTION_STATUS=$ME_ERROR_USAGE;;

@@ -12,13 +12,13 @@ class Callback {
     * @param \Webhook\Payload $payload Payload object.
     * 
     * @return void
-    * @throws \Webhook\InvalidRequest
+    * @throws \Webhook\InvalidRequestException
     * @deprecated
     * @see \Webhook\Callback::validatePayload()
     */
    public function validateRequest(string $hubSignature,string $rawPayload, Payload $payload)  {
       if (!Request::isValidSignature($this->_hubSecret, $hubSignature, $rawPayload)) {
-         throw new InvalidRequest("secret validation failed");
+         throw new InvalidRequestException("secret validation failed");
       }
       return $this->validatePayload($payload);
    }
@@ -31,7 +31,7 @@ class Callback {
     * @param \Webhook\Payload $payload Payload object.
     * 
     * @return void
-    * @throws \Webhook\InvalidRequest
+    * @throws \Webhook\InvalidRequestException
     */
    public function validatePayload(Payload $payload)  {
       
@@ -65,7 +65,7 @@ class Callback {
             
          }
          unset($url);
-         if (!$found_urlRule_match) throw new InvalidRequest("failed to find a match for the payload's repository URL; expected one of '".implode(", ",$this->_urlRule)."', got instead {$payload->repository->url}");
+         if (!$found_urlRule_match) throw new InvalidRequestException("failed to find a match for the payload's repository URL; expected one of '".implode(", ",$this->_urlRule)."', got instead {$payload->repository->url}");
       }
       
       if (count($this->_eventRule)) {
@@ -76,7 +76,7 @@ class Callback {
                break 1;
             }
          }
-         if (!$found_eventRule_match) throw new InvalidRequest("failed to find a match for the payload's GitHub-Event type");
+         if (!$found_eventRule_match) throw new InvalidRequestException("failed to find a match for the payload's GitHub-Event type");
       }
       
       

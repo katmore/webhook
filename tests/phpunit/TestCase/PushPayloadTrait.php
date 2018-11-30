@@ -2,7 +2,13 @@
 declare(strict_types=1);
 namespace Webhook\TestCase;
 
+use Webhook\Payload\PushEvent;
+
 trait PushPayloadTrait {
+   
+   public static function getExpectedPushPayloadClass() : string {
+      return PushEvent::class;
+   }
    
    public static function getExpectedPushEventName() : string {
       return 'push';
@@ -36,8 +42,12 @@ trait PushPayloadTrait {
       return $request;
    }
    
+   public static function getPushRequestSignature(string $hub_secret) : string {
+      return 'sha1='.hash_hmac('sha1', static::getPushRequestBody(), $hub_secret);
+   }
+   
    public static function getPushRequestBody() : string {
-      return <<<"PUSH_REQUEST_BODY"
+      $body = <<<"PUSH_REQUEST_BODY"
 {
   "ref": "refs/heads/master",
   "before": "d6f2bdc7ec0a166a436113029a1d8caa05e8bc2d",
@@ -247,6 +257,7 @@ trait PushPayloadTrait {
   }
 }
 PUSH_REQUEST_BODY;
+      return json_encode(json_decode($body));
    }
    
    

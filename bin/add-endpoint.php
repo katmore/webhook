@@ -408,12 +408,12 @@ register_shutdown_function(function() {
 try {
    $request = \Webhook\Request::service(file_get_contents('php://input'),isset($_SERVER)?$_SERVER:[]);
    if ($request->getRequestMethod()!=='POST') {
-      throw new \Webhook\InvalidRequest("requestMethod must be POST");
+      throw new \Webhook\InvalidRequestException("requestMethod must be POST");
    }
    $callback->validateRequest($request->getHubSignature(), $request->getMessageBody(), $request->getPayload());
-} catch(\Webhook\InvalidRequest $e) {
+} catch(\Webhook\InvalidRequestException $e) {
    http_response_code(500);
-   echo "Invalid Request: ".$e->getMessage();
+   echo $e->getMessage();
 }
 
 EOT;

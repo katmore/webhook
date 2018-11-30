@@ -119,24 +119,25 @@ class Request {
     * @param string $hub_secret Secret string known by the webhoook provider.
     *
     * @return void
-    * @throws \Webhook\InvalidRequest
+    * @throws \Webhook\SignatureInvalidException
     */
    public function validateSignature(string $hub_secret) {
       if (!self::isValidSignature($hub_secret, $this->_hubSignature, $this->_messageBody)) {
-         throw new InvalidRequest("secret validation failed");
+         throw new SignatureInvalidException;
       }
    }
    
    /**
-    * @param string $messageBody
-    * @param string $hubSignature
-    * @param string $gitHubEvent
-    * @param string $contentType Optional.
-    * @param string $gitHubDelivery Optional.
-    * @param string $requestMethod Optional.
-    * @param string $userAgent Optional.    
+    * @param string $messageBody request body; the string value of the payload
+    * @param string $hubSignature value of the 'X-Hub-Signature' header
+    * @param string $gitHubEvent github event that triggered this request (i.e. "push" or "ping")
+    * @param string $contentType Optionally specify mime type of the request body (i.e. "application/json")
+    * @param string $gitHubDelivery Optionally specify value of the 'X-GitHub-Delivery' header
+    * @param string $requestMethod Optionally specify request method (i.e. "POST")
+    * @param string $userAgent Optionally specify value of the 'User-Agent' header 
     * 
-    * @throws \Webhook\InvalidRequest if invalid value specified for hubSignature, or gitHubEvent;  
+    * @throws \Webhook\SignatureMissingException
+    * @throws \Webhook\EventMissingException
     */
    public function __construct(
          string $messageBody,string $hubSignature,string $gitHubEvent,
@@ -150,25 +151,33 @@ class Request {
       $this->_hubSignature = $hubSignature;
       $this->_gitHubDelivery = $gitHubDelivery;
       $this->_requestMethod = $requestMethod;
-      
-      if (empty($this->_contentType)) {
-         $this->_contentType = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($this->_messageBody);
-      }
+      $this->_userAgent = $userAgent;
       
       $bodyObject = null;
-      if ($this->_contentType == 'application/json') {
-         $bodyObject = json_decode($this->_messageBody);
-      } elseif ($this->_contentType == 'application/x-www-form-urlencoded') {
-         parse_str($this->_messageBody,$bodyObject);
+      
+      if (empty($this->_contentType)) {
+         if ((null!==($bodyObject = json_decode($this->_messageBody))) && is_object($bodyObject)) {
+            $this->_contentType = 'application/json';
+         }
+      }
+      
+      if ($bodyObject===null) {
+         if ($this->_contentType === 'application/json') {
+            $bodyObject = json_decode($this->_messageBody);
+         }
+      }
+      
+      if (empty($bodyObject) || !is_object($bodyObject)) {
+         throw new MessageBodyInvalidException;
       }
       
       if (empty($this->_hubSignature)) {
-         throw new InvalidRequest("missing hubSignature");
+         throw new SignatureMissingException;
       }
       
       $payload = null;
       $eventSubns = "";
-      if (!empty($this->_gitHubEvent) && !empty($bodyObject)) {
+      if (!empty($this->_gitHubEvent)) {
          $eventSubns = str_replace(" ","",ucwords(str_replace("_"," ",$this->_gitHubEvent)))."Event";
          $payload = __NAMESPACE__ . '\Payload\\'.$eventSubns;
          if (class_exists($payload)) {
@@ -177,7 +186,7 @@ class Request {
             $this->_payload = new Payload\Event($bodyObject, $this->_gitHubEvent);
          }
       } else {
-         throw new InvalidRequest("missing gitHubEvent");
+         throw new EventMissingException;
       }
    }
    

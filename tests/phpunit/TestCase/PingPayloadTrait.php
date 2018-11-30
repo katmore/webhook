@@ -2,7 +2,13 @@
 declare(strict_types=1);
 namespace Webhook\TestCase;
 
+use Webhook\Payload\PingEvent;
+
 trait PingPayloadTrait {
+   
+   public static function getExpectedPingPayloadClass() : string {
+      return PingEvent::class;
+   }
    
    public static function getExpectedPingEventName() : string {
       return 'ping';
@@ -36,8 +42,12 @@ trait PingPayloadTrait {
       return $request;
    }
    
+   public static function getPingRequestSignature(string $hub_secret) : string {
+      return 'sha1='.hash_hmac('sha1', static::getPingRequestBody(), $hub_secret);
+   }
+   
    public static function getPingRequestBody() : string {
-      return <<<"PUSH_REQUEST_BODY"
+      $body = <<<"PUSH_REQUEST_BODY"
 {
   "zen": "It's not fully flopped until it's farting.",
   "hook_id": 66666666,
@@ -187,6 +197,7 @@ trait PingPayloadTrait {
   }
 }
 PUSH_REQUEST_BODY;
+      return json_encode(json_decode($body));
    }
    
    
