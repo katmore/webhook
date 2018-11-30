@@ -1,6 +1,5 @@
 # Webhook
-
-Wrappers and webservice to handle [Github Webhook requests](https://developer.github.com/webhooks/).
+[Github Webhook](https://developer.github.com/webhooks/) client receiver wrappers and webservice.
 
 [Webhook Project Homepage](https://github.com/katmore/webhook)
 
