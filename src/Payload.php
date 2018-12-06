@@ -2,6 +2,7 @@
 namespace Webhook;
 
 use Webhook\PayloadData\Sender;
+use Webhook\PayloadData\Repository;
 
 abstract class Payload implements Populatable, PopulateListener {
    
@@ -15,6 +16,7 @@ abstract class Payload implements Populatable, PopulateListener {
     * @var \Webhook\PayloadData\Sender
     */
    public $sender;
+
    
    use PopulatorTrait;
    

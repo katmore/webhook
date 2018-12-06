@@ -46,29 +46,29 @@ class PingEventPayloadTest extends TestCase {
       
    }
    
-   /**
-    * @depends testPingEventPayloadEventName
-    * @dataProvider pingEventDataProvider
-    */
-   public function testPingEventPayloadToEvent(PingEvent $ping_event) {
-      $event = $ping_event->toEvent();
-      $this->assertEquals($ping_event->getEvent(), $event->getEvent());
+//    /**
+//     * @depends testPingEventPayloadEventName
+//     * @dataProvider pingEventDataProvider
+//     */
+//    public function testPingEventPayloadToEvent(PingEvent $ping_event) {
+//       $event = $ping_event->toEvent();
+//       $this->assertEquals($ping_event->getEvent(), $event->getEvent());
       
-   }
+//    }
    
-   public function pingEventDataToEventProvider() : array {
-      return [
-         [static::getPingRequestObject(),(new PingEvent(static::getPingRequestObject()))->toEvent()],
-      ];
-   }
+//    public function pingEventDataToEventProvider() : array {
+//       return [
+//          [static::getPingRequestObject(),(new PingEvent(static::getPingRequestObject()))->toEvent()],
+//       ];
+//    }
    
-   /**
-    * @depends testPingEventPayloadToEvent
-    * @dataProvider pingEventDataToEventProvider
-    */
-   public function testPingEventPayloadToEventData(stdClass $ping_request_obj,Event $event) {
-      $this->payloadObjectEqualityTests($ping_request_obj, $event);
-   }
+//    /**
+//     * @depends testPingEventPayloadToEvent
+//     * @dataProvider pingEventDataToEventProvider
+//     */
+//    public function testPingEventPayloadToEventData(stdClass $ping_request_obj,Event $event) {
+//       $this->payloadObjectEqualityTests($ping_request_obj, $event);
+//    }
    
    
    

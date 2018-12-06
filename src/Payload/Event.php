@@ -2,8 +2,12 @@
 namespace Webhook\Payload;
 
 use Webhook\Payload;
-
+use Webhook\PayloadData\Repository;
 class Event extends Payload implements EventProviderInterface {
+   /**
+    * @var \Webhook\PayloadData\Repository
+    */
+   public $repository;
    
    /**
     * Populates a "generic" Payload <b>Event</b> object corresponding to this event.
@@ -50,11 +54,11 @@ class Event extends Payload implements EventProviderInterface {
       
       $this->_event = $gitHubEvent;
       
-      $pubProp = [];
-      foreach((new \ReflectionObject($input))->getProperties(\ReflectionProperty::IS_PUBLIC) as $v) {
-         $pubProp[]=$v->getName();
-      }
-      unset($v);
+//       $pubProp = [];
+//       foreach((new \ReflectionObject($input))->getProperties(\ReflectionProperty::IS_PUBLIC) as $v) {
+//          $pubProp[]=$v->getName();
+//       }
+//       unset($v);
       
       $this->_payloadData = json_decode(json_encode($input),true);
       
@@ -62,7 +66,12 @@ class Event extends Payload implements EventProviderInterface {
    }
    
    
-   
+   public function populateComplete() {
+      parent::populateComplete();
+      if (!$this->repository instanceof Repository) {
+         $this->repository = (new Repository)->populateFromObject($this->repository);
+      }
+   }
    
    
    

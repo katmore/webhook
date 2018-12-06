@@ -118,7 +118,9 @@ class Callback {
    public function __construct(string $hubSecret,callable $callback,CallbackRule ...$CallbackRule) {
       $this->_hubSecret = $hubSecret;
       $this->_callback = $callback;
+      
       foreach($CallbackRule as $v) {
+         
          if ($v instanceof UrlCallbackRule) {
             $this->_urlRule []= (string) $v;
          }

@@ -5,7 +5,7 @@ use Webhook\Payload;
 use Webhook\PayloadData\Hook;
 use Webhook\PayloadData\PingRepository;
 
-class PingEvent extends Payload implements EventProviderInterface {
+class PingEvent extends Payload  {
    
    /**
     * @var string The random message generated for this ping event.
@@ -35,13 +35,15 @@ class PingEvent extends Payload implements EventProviderInterface {
    
    const EVENT_NAME = 'ping';
    
-   /**
-    * Populates a "generic" Payload <b>Event</b> object corresponding to this event.
-    * @return \Webhook\Payload\Event
-    */
-   public function toEvent() : Event {
-      return new Event($this->input,static::EVENT_NAME);
-   }
+//    /**
+//     * Populates a "generic" Payload <b>Event</b> object corresponding to this event.
+//     * @return \Webhook\Payload\Event
+//     */
+//    public function toEvent() : Event {
+//       $data = json_decode(json_encode($this));
+      
+//       return new Event(json_decode(json_encode($this)),static::EVENT_NAME);
+//    }
    
    /**
     * Provides the event name.
