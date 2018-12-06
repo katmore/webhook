@@ -1,0 +1,88 @@
+#!/bin/sh
+# starts PHP's built-in web server on webhook/web
+#
+
+ME_ABOUT="starts PHP's built-in web server on webhook/web"
+ME_COPYRIGHT='Copyright (c) 2018, Doug Bird. All Rights Reserved.'
+ME_NAME='webservice'
+ME_DIR="/$0"; ME_DIR=${ME_DIR%/*}; ME_DIR=${ME_DIR:-.}; ME_DIR=${ME_DIR#/}/; ME_DIR=$(cd "$ME_DIR"; pwd)
+
+#
+# default values
+DEFAULT_PORT=8100 # default TCP port
+DEFAULT_ADDR='0.0.0.0' # default interface address
+DEFAULT_DOCROOT=$ME_DIR/../web # default document root
+
+#
+# usage
+ME_USAGE="[--port=<PORT>(=$DEFAULT_PORT)][--addr=<ADDR>(=$DEFAULT_ADDR)][--docroot=<DOCROOT>(=webhook/web)] [[--]<...passthru args>]"
+
+#
+# print_hint function
+print_hint() {
+	echo "  Hint, try: $ME_NAME --usage"
+}
+
+#
+# parse options
+PORT=$DEFAULT_PORT
+ADDR=$DEFAULT_ADDR
+DOCROOT=$DEFAULT_DOCROOT
+OPTION_STATUS=0
+while getopts :?qhua-: arg; do { case $arg in
+   h|u|a) HELP_MODE=1;;
+   -) LONG_OPTVAL="${OPTARG#*=}"; case $OPTARG in
+      help|usage|about) HELP_MODE=1;;
+      port=*) PORT=$LONG_OPTVAL;;
+      addr=*) ADDR=$LONG_OPTVAL;;
+      docroot=*) DOCROOT=$LONG_OPTVAL;;
+      *) >&2 echo "$ME_NAME: unrecognized long option --$OPTARG"; OPTION_STATUS=$ME_ERROR_USAGE;;
+   esac ;; 
+   *) >&2 echo "$ME_NAME: unrecognized option -$OPTARG"; OPTION_STATUS=$ME_ERROR_USAGE;;
+esac } done
+shift $((OPTIND-1)) # remove parsed options and args from $@ list
+[ "$OPTION_STATUS" != "0" ] && { >&2 echo "$ME_NAME: (FATAL) one or more invalid options"; >&2 print_hint; exit $OPTION_STATUS; }
+
+#
+# apply help mode
+if [ "$HELP_MODE" ]; then
+   echo "$ME_NAME"
+   echo "$ME_ABOUT"
+   echo "$ME_COPYRIGHT"
+   echo ""
+   echo "Usage:"
+   echo "  $ME_NAME $ME_USAGE"
+   echo ""
+   echo "Options:"
+   echo "  --port=<PORT>"
+   echo "    TCP port number the web server will listen on."
+   echo "    Default: $DEFAULT_PORT"
+   echo ""
+   echo "  --addr=<ADDR>"
+   echo "    Address of the interface the web server bind to."
+   echo "    Default: $DEFAULT_ADDR"
+   echo "    The address '0.0.0.0' will bind to all available interfaces."
+   echo ""
+   echo "  --docroot=<DOCROOT>"
+   echo "    The document root the web server will."
+   echo "    Default: $DEFAULT_DOCROOT"
+   exit 0
+fi
+
+#
+# enforce dependencies
+php -v > /dev/null 2>&1 || {
+   >&2 echo "$ME_NAME: (FATAL) system is missing the 'php' command"
+   exit 1
+}
+
+#
+# start the web server
+php -S $ADDR:$PORT -t $DOCROOT "$@"
+
+
+
+
+
+
+

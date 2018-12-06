@@ -3,7 +3,7 @@
 #
 
 ME_ABOUT='wrapper to peform unit tests'
-ME_USAGE='[<...OPTIONS>] [<TEST-SUITE>]'
+ME_USAGE='[<...OPTIONS>] [<TEST-SUITE>] [[--]<...passthru args>]'
 ME_COPYRIGHT='Copyright (c) 2016-2018, Doug Bird. All Rights Reserved.'
 ME_NAME='tests.sh'
 ME_DIR="/$0"; ME_DIR=${ME_DIR%/*}; ME_DIR=${ME_DIR:-.}; ME_DIR=${ME_DIR#/}/; ME_DIR=$(cd "$ME_DIR"; pwd)
