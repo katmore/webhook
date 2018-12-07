@@ -4,7 +4,7 @@
 
 ME_ABOUT='wrapper to peform unit tests'
 ME_USAGE='[<...OPTIONS>] [<TEST-SUITE>] [[--]<...passthru args>]'
-ME_COPYRIGHT='Copyright (c) 2016-2018, Doug Bird. All Rights Reserved.'
+ME_COPYRIGHT='Copyright (c) 2018, Doug Bird. All Rights Reserved.'
 ME_NAME='tests.sh'
 ME_DIR="/$0"; ME_DIR=${ME_DIR%/*}; ME_DIR=${ME_DIR:-.}; ME_DIR=${ME_DIR#/}/; ME_DIR=$(cd "$ME_DIR"; pwd)
 ME_SOURCE="$ME_DIR/$0"
@@ -13,8 +13,11 @@ ME_SOURCE="$ME_DIR/$0"
 # paths
 #
 HTML_ROOT=$ME_DIR/web
+DOCS_ROOT=$ME_DIR/docs
 PHPUNIT_BIN=$ME_DIR/vendor/bin/phpunit
 PHPUNIT_TESTS_ROOT=$ME_DIR/tests
+HTML_COVERAGE_ROOT_PREFIX=$DOCS_ROOT/coverage
+HTML_COVERAGE_SYMLINK_PREFIX=$HTML_ROOT/.coverage
 
 #
 # exit codes
@@ -72,7 +75,7 @@ if [ "$HELP_MODE" ]; then
    echo "    Always skip creating coverage reports."
    echo ""
    echo "  --html-coverage"
-   echo "    Creates a coverage report in HTML format in a hidden folder in the project's 'web' directory."
+   echo "    Creates a coverage report in HTML format in a hidden folder in the project's 'docs' directory."
    echo "    Ignored if xdebug is not available."
    echo ""
    echo "  --print-coverage"
@@ -158,20 +161,32 @@ print_phpunit_text_coverage_path() {
 print_phpunit_html_coverage_path() {
 	 local test_suffix=$1
 	 if [ -z "$test_suffix" ]; then
-	 	  printf "$HTML_ROOT/.coverage"
+	 	  printf "$HTML_COVERAGE_ROOT_PREFIX"
  	 else
- 	    printf "$HTML_ROOT/.coverage-$test_suffix"
+ 	    printf "$HTML_COVERAGE_ROOT_PREFIX-$test_suffix"
  	 fi
 }
 
+print_phpunit_html_coverage_symlink_path() {
+    local test_suffix=$1
+    if [ -z "$test_suffix" ]; then
+        printf "$HTML_COVERAGE_SYMLINK_PREFIX"
+    else
+       printf "$HTML_COVERAGE_SYMLINK_PREFIX-$test_suffix"
+    fi
+}
+
 print_phpunit_coverage_opt() {
-	 local test_suffix=$1
-	 [ "$SKIP_COVERAGE_REPORT" = "0" ] || return 0
+	local test_suffix=$1
+	[ "$SKIP_COVERAGE_REPORT" = "0" ] || return 0
    xdebug_sanity_check || return 0
    if [ "$HTML_COVERAGE_REPORT" = "1" ]; then
    	 printf " --coverage-html=$(print_phpunit_html_coverage_path $test_suffix) "
+   	 if ( [ ! -e "$HTML_COVERAGE_SYMLINK_PREFIX" ] && [ -d "$(dirname $HTML_COVERAGE_SYMLINK_PREFIX)" ] ); then
+   	    ln -s $(print_phpunit_html_coverage_path $test_suffix) $(print_phpunit_html_coverage_symlink_path)
+   	 fi 
    fi
-	 printf " --coverage-text=$(print_phpunit_text_coverage_path $test_suffix) "
+	printf " --coverage-text=$(print_phpunit_text_coverage_path $test_suffix) "
 }
 
 print_phpunit_coverage_report() {
