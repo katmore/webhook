@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project title="API Documentation" version="v2.9.0">
+<project title="Webhook" version="v2.9.0">
   <partials/>
   <file path="PayloadData/GitUser.php" generated-path="PayloadData.GitUser.html" hash="330294e496a47481cbed0b14627f9089" package="Default">
     <docblock line="0">
