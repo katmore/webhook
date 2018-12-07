@@ -53,7 +53,10 @@ if [ "$HELP_MODE" ]; then
    echo "   Erase existing documentation contents before proceeding."
    echo ""
    echo "  --generate-pdf"
-   echo "   Use "
+   echo "   Use 'wkhtmltopdf' and 'phpunite' to generate a PDF file from the HTML."
+   echo ""
+   echo "  --generate-md"
+   echo "   Use 'html2markdown' to generate a markdown (.md) file from the HTML."
    exit 0
 fi
 
