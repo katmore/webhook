@@ -3,7 +3,9 @@ namespace Webhook\Payload;
 
 use Webhook\Payload;
 use Webhook\PayloadData\Repository;
+
 class Event extends Payload implements EventProviderInterface {
+   
    /**
     * @var \Webhook\PayloadData\Repository
     */
@@ -18,10 +20,10 @@ class Event extends Payload implements EventProviderInterface {
    }
    
    /**
-    * @var string event name
-    * @private
+    * @var string
     */
    private $_event;
+   
    /**
     * Provides the event name.
     * @return string
@@ -32,7 +34,6 @@ class Event extends Payload implements EventProviderInterface {
    
    /**
     * @var array assoc array of payload data
-    * @private
     */
    private $_payloadData=[];
    
@@ -54,14 +55,7 @@ class Event extends Payload implements EventProviderInterface {
       
       $this->_event = $gitHubEvent;
       
-//       $pubProp = [];
-//       foreach((new \ReflectionObject($input))->getProperties(\ReflectionProperty::IS_PUBLIC) as $v) {
-//          $pubProp[]=$v->getName();
-//       }
-//       unset($v);
-      
       $this->_payloadData = json_decode(json_encode($input),true);
-      
       
    }
    

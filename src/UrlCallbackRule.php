@@ -2,6 +2,7 @@
 namespace Webhook;
 
 class UrlCallbackRule extends CallbackRule {
+   
    /**
     * @param string $url url
     */

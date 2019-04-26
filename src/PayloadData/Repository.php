@@ -12,11 +12,6 @@ class Repository implements Populatable,PopulateListener {
    use PopulatorTrait;
    
    /**
-    * @var \Webhook\PayloadData\RepositoryOwner repository owner object for this repo
-    */
-   public $owner;
-   
-   /**
     * @var string default branch for this repo
     */
    public $default_branch;
@@ -33,13 +28,7 @@ class Repository implements Populatable,PopulateListener {
    
    public function populateComplete() {
       
-      if (!$this->owner instanceof RepositoryOwner) {
-         $this->owner = (new RepositoryOwner)->populateFromObject($this->owner);
-      }
-      
-      if (!$this->license instanceof License) {
-         $this->license = (new License)->populateFromObject($this->license);
-      }
+      $this->respositoryPopulateComplete();
       
    }
    
