@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpdoc>
+<phpdocumentor>
   <title>Webhook</title>
   <parser>
     <target>.phpdoc-parser</target>
@@ -15,4 +15,4 @@
   <files>
     <directory>./src</directory>
   </files>
-</phpdoc>
+</phpdocumentor>

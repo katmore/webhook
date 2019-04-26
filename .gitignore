@@ -5,4 +5,7 @@ composer.lock
 /web/
 !/web/endpoint-example.php
 phpdoc.xml
+/docs/coverage/
+/docs/phpdoc/
+/build/
 !/**/.gitkeep
