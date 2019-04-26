@@ -8,15 +8,15 @@ class RepositoryOwner implements Populatable {
     
    /**
     * @var string
-    *    The repostory owner's name.
+    *    The repostory owner's login.
     */
-   public $name;
+   public $login;
    
    /**
-    * @var string
-    *    The repostory owner's email address.
+    * @var int
+    *    The repostory owner's id.
     */
-   public $email;
+   public $id;
    
    use PopulatorTrait;
 }

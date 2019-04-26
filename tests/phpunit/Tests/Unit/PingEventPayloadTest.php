@@ -8,7 +8,6 @@ use Webhook\TestCase\PingPayloadTrait;
 use Webhook\TestCase\PayloadDataTrait;
 
 use Webhook\Payload\PingEvent;
-use Webhook\Payload\Event;
 
 use stdClass;
 

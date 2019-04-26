@@ -5,6 +5,8 @@
  * - includes webhook/vendor/autoload.php
  */
 
+$config = [];
+
 $config['app_root'] = __DIR__.'/../../';
 $config['autoload'] = "{$config['app_root']}/vendor/autoload.php";
 

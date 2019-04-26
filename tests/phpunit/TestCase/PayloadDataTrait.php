@@ -54,18 +54,20 @@ trait PayloadDataTrait {
       $r = new ReflectionClass($data);
       $reader = new PhpDocReader();
       foreach($data as $prop=>$val) {
-         $this->assertObjectHasAttribute($prop, $object);
+         //"Failed on: $node_name.$key"
+         $node_name = get_class($data);
+         $this->assertObjectHasAttribute($prop,$object,"Failed on: $node_name.$prop");
          if (is_scalar($val)) {
-            $this->assertAttributeEquals($object->$prop, $prop, $data);
+            $this->assertAttributeEquals($object->$prop, $prop, $data,"Failed on: $node_name.$prop");
          } else if (is_object($val)) {
-            $this->assertAttributeInternalType('object', $prop, $object);
+            $this->assertAttributeInternalType('object', $prop, $object,"Failed on: $node_name.$prop");
             $rp = $r->getProperty($prop);
             $propClass = $reader->getPropertyClass($rp);
-            $this->assertAttributeInstanceOf($propClass, $prop, $data);
-            $this->payloadIterableTests($object->$prop, $val,get_class($data).".$prop");
+            $this->assertAttributeInstanceOf($propClass, $prop, $data,"Failed on: $node_name.$prop");
+            $this->payloadIterableTests($object->$prop, $val,"$node_name.$prop");
          } else if (is_array($val)) {
-            $this->assertAttributeInternalType('array', $prop, $object);
-            $this->payloadIterableTests($object->$prop, $val,get_class($data).".$prop");
+            $this->assertAttributeInternalType('array', $prop, $object,"Failed on: $node_name.$prop");
+            $this->payloadIterableTests($object->$prop, $val,"$node_name.$prop");
          }
       }
    }

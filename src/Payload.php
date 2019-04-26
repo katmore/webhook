@@ -19,11 +19,6 @@ abstract class Payload implements Populatable, PopulateListener {
    public $sender;
    
    /**
-    * @var \Webhook\PayloadData\Organization
-    */
-   public $organization;
-   
-   /**
     * @var \Webhook\PayloadData\Repository
     */
    public $repository;
@@ -38,10 +33,6 @@ abstract class Payload implements Populatable, PopulateListener {
       
       if (!$this->sender instanceof Sender) {
          $this->sender = (new Sender)->populateFromObject($this->sender);
-      }
-      
-      if (!$this->organization instanceof Organization) {
-         $this->organization = (new Organization)->populateFromObject($this->organization);
       }
       
       if (!$this->repository instanceof Repository) {

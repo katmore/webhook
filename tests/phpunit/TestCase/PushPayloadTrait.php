@@ -47,7 +47,7 @@ trait PushPayloadTrait {
    }
    
    public static function getPushRequestBody() : string {
-      $body = <<<"PUSH_REQUEST_BODY"
+      $body = <<<'PUSH_REQUEST_BODY'
 {
   "ref": "refs/heads/master",
   "before": "d6f2bdc7ec0a166a436113029a1d8caa05e8bc2d",

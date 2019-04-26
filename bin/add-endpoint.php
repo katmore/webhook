@@ -65,7 +65,7 @@ new class() {
       $fallbackRepoType = self::FALLBACK_REPO_TYPE;
       $validRepoTypesCsv = implode(", ",self::VALID_REPO_TYPES);
       $validRepoTypesPsv = implode("|",self::VALID_REPO_TYPES);
-      echo <<<"EOT"
+      echo <<<'EOT'
 Runtime Mode Options:
 
   --help

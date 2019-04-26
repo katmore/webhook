@@ -2,18 +2,13 @@
 namespace Webhook\Payload;
 
 use Webhook\Payload;
-use Webhook\PayloadData\Commit;
-use Webhook\PayloadData\HeadCommit;
-use Webhook\PayloadData\Pusher;
-use Webhook\PayloadData\Organization;
-use Webhook\PayloadData\Repository;
+use Webhook\PayloadData;
 
 /**
  * Payload data provided by PushEvent
  * @see https://developer.github.com/v3/activity/events/types/#pushevent
  */
 class PushEvent extends Payload {
-   
    
    /**
     * @var \Webhook\PayloadData\Organization
@@ -104,25 +99,25 @@ class PushEvent extends Payload {
       parent::populateComplete();
       
       foreach($this->commits as &$commit) {
-         if ((!$commit instanceof Commit) && is_object($commit)) {
-            $commit = (new Commit)->populateFromObject($commit);
+         if ((!$commit instanceof PayloadData\Commit) && is_object($commit)) {
+            $commit = (new PayloadData\Commit)->populateFromObject($commit);
          }
       }
       
-      if ((!$this->head_commit instanceof HeadCommit) && is_object($this->head_commit)) {
-         $this->head_commit = (new HeadCommit)->populateFromObject($this->head_commit);
+      if ((!$this->head_commit instanceof PayloadData\HeadCommit) && is_object($this->head_commit)) {
+         $this->head_commit = (new PayloadData\HeadCommit)->populateFromObject($this->head_commit);
       }
       
-      if ((!$this->pusher instanceof Pusher) && is_object($this->pusher)) {
-         $this->pusher = (new Pusher)->populateFromObject($this->pusher);
+      if ((!$this->pusher instanceof PayloadData\Pusher) && is_object($this->pusher)) {
+         $this->pusher = (new PayloadData\Pusher)->populateFromObject($this->pusher);
       }
       
-      if (!$this->organization instanceof Organization) {
-         $this->organization = (new Organization)->populateFromObject($this->organization);
+      if (!$this->organization instanceof PayloadData\Organization) {
+         $this->organization = (new PayloadData\Organization)->populateFromObject($this->organization);
       }
       
-      if (!$this->repository instanceof Repository) {
-         $this->repository = (new Repository)->populateFromObject($this->repository);
+      if (!$this->repository instanceof PayloadData\Repository) {
+         $this->repository = (new PayloadData\Repository)->populateFromObject($this->repository);
       }
    }
 }
