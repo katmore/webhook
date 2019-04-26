@@ -2,6 +2,7 @@
 namespace Webhook\PayloadData;
 
 trait RepositoryTrait {
+   
    /**
     * @var string The id of the repository.
     */
@@ -21,6 +22,11 @@ trait RepositoryTrait {
     * @var bool true if a private repo, <b>bool</b> false otherwise
     */
    public $private;
+   
+   /**
+    * @var \Webhook\PayloadData\RepositoryOwner repository owner object for this repo
+    */
+   public $owner;
    
    /**
     * @var string repo description
@@ -116,4 +122,17 @@ trait RepositoryTrait {
     * @var int number of issues this repo has
     */
    public $open_issues;
+   
+   protected function respositoryPopulateComplete() {
+      
+      if (!$this->owner instanceof RepositoryOwner) {
+         $this->owner = (new RepositoryOwner)->populateFromObject($this->owner);
+      }
+      
+      if (!$this->license instanceof License) {
+         $this->license = (new License)->populateFromObject($this->license);
+      }
+      
+   }
+   
 }

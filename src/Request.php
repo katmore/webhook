@@ -3,51 +3,50 @@ namespace Webhook;
 
 class Request {
    
+   
    /**
-    * @var string The raw payload of this delivery.
-    * @private
+    * @var string
+    *    The raw payload of this delivery.
     */
    private $_messageBody;
    
    /**
-    * @var string The content-Type of the payload.
-    * @private
+    * @var string
+    *    The content-Type of the payload.
     */
    private $_contentType;
    
    /**
     * @var string GitHub Event Type of this delivery.
-    * @private
     */
    private $_gitHubEvent;
    
    /**
-    * @var string The Hub-Signature provided along with this delivery.
-    * @private
+    * @var string
+    *    The Hub-Signature provided along with this delivery.
     */
    private $_hubSignature;
    
    /**
-    * @var string The UUID of this delivery.
-    * @private
+    * @var string
+    *    The UUID of this delivery.
     */
    private $_gitHubDelivery;
    
    /**
-    * @var string The request method of this delivery.
-    * @private
+    * @var string
+    *    The request method of this delivery.
     */
    private $_requestMethod;
    
    /**
-    * @var string The user-agent reported for this delivery.
-    * @private
+    * @var string
+    *    The user-agent reported for this delivery.
     */
    private $_userAgent;
    
    /**
     * @var \Webhook\Payload
-    * @private
     */
    private $_payload;
    
@@ -66,7 +65,7 @@ class Request {
    
    /**
     * Provides a webhook request object from specified paramaters.
-    *    Suitable for use in conjunction with the $_SERVER superglobal.
+    *    Suitable for use in conjunction with the $_SERVER array.
     *
     * @param string $messageBody request message body
     * @param array $param assoc array of paramaters:<ul>
@@ -78,9 +77,7 @@ class Request {
     *    <li><b>string $param['HTTP_USER_AGENT']</b> HTTP_USER_AGENT.</li>
     * </ul>
     *
-    * @return \Webhook\Request request object
-    * 
-    * @see $_SERVER
+    * @return \Webhook\Request
     */
    public static function service(string $messageBody,array $param=null) {
       $request = array_fill_keys(static::SERVICE_PARAMS, '');
@@ -88,6 +85,8 @@ class Request {
          foreach($request as $k=>&$v) {
             if (isset($param[$k])) $v=$param[$k];
          }
+         unset($k);
+         unset($v);
       }
       return new static(
             $messageBody,$request['HTTP_X_HUB_SIGNATURE'],$request['HTTP_X_GITHUB_EVENT'],
@@ -119,25 +118,24 @@ class Request {
     * @param string $hub_secret Secret string known by the webhoook provider.
     *
     * @return void
-    * @throws \Webhook\SignatureInvalidException
+    * @throws \Webhook\InvalidRequest
     */
    public function validateSignature(string $hub_secret) {
       if (!self::isValidSignature($hub_secret, $this->_hubSignature, $this->_messageBody)) {
-         throw new SignatureInvalidException;
+         throw new InvalidRequest("secret validation failed");
       }
    }
    
    /**
-    * @param string $messageBody request body; the string value of the payload
-    * @param string $hubSignature value of the 'X-Hub-Signature' header
-    * @param string $gitHubEvent github event that triggered this request (i.e. "push" or "ping")
-    * @param string $contentType Optionally specify mime type of the request body (i.e. "application/json")
-    * @param string $gitHubDelivery Optionally specify value of the 'X-GitHub-Delivery' header
-    * @param string $requestMethod Optionally specify request method (i.e. "POST")
-    * @param string $userAgent Optionally specify value of the 'User-Agent' header 
+    * @param string $messageBody
+    * @param string $hubSignature
+    * @param string $gitHubEvent
+    * @param string $contentType Optional.
+    * @param string $gitHubDelivery Optional.
+    * @param string $requestMethod Optional.
+    * @param string $userAgent Optional.    
     * 
-    * @throws \Webhook\SignatureMissingException
-    * @throws \Webhook\EventMissingException
+    * @throws \Webhook\InvalidRequest if invalid value specified for hubSignature, or gitHubEvent;  
     */
    public function __construct(
          string $messageBody,string $hubSignature,string $gitHubEvent,
@@ -151,33 +149,25 @@ class Request {
       $this->_hubSignature = $hubSignature;
       $this->_gitHubDelivery = $gitHubDelivery;
       $this->_requestMethod = $requestMethod;
-      $this->_userAgent = $userAgent;
-      
-      $bodyObject = null;
       
       if (empty($this->_contentType)) {
-         if ((null!==($bodyObject = json_decode($this->_messageBody))) && is_object($bodyObject)) {
-            $this->_contentType = 'application/json';
-         }
+         $this->_contentType = (new \finfo(\FILEINFO_MIME_TYPE))->buffer($this->_messageBody);
       }
       
-      if ($bodyObject===null) {
-         if ($this->_contentType === 'application/json') {
-            $bodyObject = json_decode($this->_messageBody);
-         }
-      }
-      
-      if (empty($bodyObject) || !is_object($bodyObject)) {
-         throw new MessageBodyInvalidException;
+      $bodyObject = null;
+      if ($this->_contentType == 'application/json') {
+         $bodyObject = json_decode($this->_messageBody);
+      } elseif ($this->_contentType == 'application/x-www-form-urlencoded') {
+         parse_str($this->_messageBody,$bodyObject);
       }
       
       if (empty($this->_hubSignature)) {
-         throw new SignatureMissingException;
+         throw new InvalidRequest("missing hubSignature");
       }
       
       $payload = null;
       $eventSubns = "";
-      if (!empty($this->_gitHubEvent)) {
+      if (!empty($this->_gitHubEvent) && !empty($bodyObject)) {
          $eventSubns = str_replace(" ","",ucwords(str_replace("_"," ",$this->_gitHubEvent)))."Event";
          $payload = __NAMESPACE__ . '\Payload\\'.$eventSubns;
          if (class_exists($payload)) {
@@ -186,14 +176,12 @@ class Request {
             $this->_payload = new Payload\Event($bodyObject, $this->_gitHubEvent);
          }
       } else {
-         throw new EventMissingException;
+         throw new InvalidRequest("missing gitHubEvent");
       }
    }
    
    /**
-    * Provides the payload object of this delivery.
-    * 
-    * @return \Webhook\Payload payload object
+    * @return \Webhook\Payload
     */
    public function getPayload(): Payload {  
       
@@ -201,8 +189,7 @@ class Request {
    }
    
    /**
-    * Provides the raw message body of this delivery.
-    * @return string message body
+    * @return string The raw payload of this delivery.
     */
    public function getMessageBody(): string {
       
@@ -211,8 +198,8 @@ class Request {
    }
    
    /**
-    * Provides the content-Type of the payload.
-    * @return string content-Type
+    * @return string
+    *    The content-Type of the payload.
     */
    public function getContentType(): string {
       
@@ -221,8 +208,7 @@ class Request {
    }
    
    /**
-    * Provides the GitHub Event Type of this delivery.
-    * @return string GitHub Event Type
+    * @return string GitHub Event Type of this delivery.
     */
    public function getGitHubEvent(): string {
       
@@ -231,8 +217,8 @@ class Request {
    }
    
    /**
-    * Provides the Hub-Signature provided along with this delivery.
-    * @return string Hub-Signature
+    * @return string
+    *    The Hub-Signature provided along with this delivery.
     */
    public function getHubSignature(): string {
    
@@ -241,8 +227,8 @@ class Request {
    }
    
    /**
-    * Provides the UUID of this delivery.
-    * @return string UUID
+    * @return string
+    *    The UUID of this delivery.
     */
    public function getGitHubDelivery(): string {
       
@@ -251,8 +237,8 @@ class Request {
    }
    
    /**
-    * Provides the request method of this delivery.
-    * @return string request method
+    * @return string
+    *    The request method of this delivery.
     */
    public function getRequestMethod(): string {
       
@@ -261,8 +247,8 @@ class Request {
    }
    
    /**
-    * Provides the user-agent reported for this delivery.
-    * @return string user-agent
+    * @return string
+    *    The user-agent reported for this delivery.
     */
    public function getUserAgent(): string {
       
